@@ -1,0 +1,48 @@
+{
+  "name": "shc-api",
+  "version": "1.0.0",
+  "description": "",
+  "main": "./lib/index.js",
+  "module": "./lib/index.mjs",
+  "files": [
+    "/lib",
+    "/index.d.ts"
+  ],
+  "exports": {
+    ".": {
+      "import": "./lib/index.mjs",
+      "require": "./lib/index.js",
+      "types": "./index.d.ts"
+    }
+  },
+  "scripts": {
+    "lint": "eslint . -c eslint.config.js",
+    "prettier:check": "prettier . --check",
+    "prettier:write": "prettier . -w",
+    "clean": "rm -rf lib/*",
+    "build:esm": "rollup --config ./configs/rollup.config.mjs",
+    "build:cjs": "tsc -p ./configs/tsconfig.cjs.json",
+    "build:types": "tsc -p ./configs/tsconfig.types.json",
+    "build": "npm run clean && npm run build:cjs && npm run build:esm",
+    "start": "npm run build:esm && node ./lib/index.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@rollup/plugin-typescript": "^11.1.6",
+    "@types/node": "^20.12.8",
+    "@types/npm": "^7.19.3",
+    "eslint": "^8.56.0",
+    "eslint-config-defaults": "^9.0.0",
+    "eslint-config-prettier": "^9.1.0",
+    "prettier": "^3.2.5",
+    "rollup": "^4.17.2",
+    "tslib": "^2.6.2",
+    "typescript": "^5.4.5",
+    "typescript-eslint": "^7.8.0"
+  },
+  "dependencies": {
+    "npm": "^10.8.2"
+  }
+}
