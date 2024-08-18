@@ -24,7 +24,7 @@
     "build:cjs": "tsc -p ./configs/tsconfig.cjs.json",
     "build:types": "tsc -p ./configs/tsconfig.types.json",
     "build": "npm run clean && npm run build:cjs && npm run build:esm",
-    "start": "npm run build:esm && node ./lib/index.js"
+    "start": "ts-node src/index.ts"
   },
   "keywords": [],
   "author": "",
@@ -40,9 +40,8 @@
     "rollup": "^4.17.2",
     "tslib": "^2.6.2",
     "typescript": "^5.4.5",
-    "typescript-eslint": "^7.8.0"
+    "typescript-eslint": "^7.8.0",
+    "ts-node": "^10.9.2"
   },
-  "dependencies": {
-    "npm": "^10.8.2"
-  }
+  "dependencies": {}
 }
