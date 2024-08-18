@@ -1,5 +1,5 @@
 {
-  "name": "shc-test-plugin",
+  "name": "shc-plugin-test",
   "version": "1.0.0",
   "main": "index.js",
   "shc": {
@@ -7,6 +7,7 @@
     "displayName": "test plugin",
     "description": "this is just a test plugin"
   },
-  "dependencies": [],
-  "devDependencies": []
+  "dependencies": {
+    "zod": "^3.23.8"
+  }
 }
