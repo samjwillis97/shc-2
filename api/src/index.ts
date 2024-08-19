@@ -3,22 +3,26 @@ import childProcess from "child_process";
 import { tmpdir } from "os";
 import path from "path";
 import { dirname } from "node:path";
-import { existsSync } from "node:fs";
+import { existsSync, readdirSync, statSync } from "node:fs";
 
 console.log("Hello, World!");
+
+export interface Module {
+  default: () => void;
+}
 
 export interface Plugin {
   name: string;
   directory: string;
+  module: Module;
 }
 
-const pluginMap: Record<string, Plugin> = {
-  // "name": "module"
-};
+const pluginMap: Record<string, Plugin> = {};
 
 const pluginName = "shc-plugin-test"; // FIXME: This should be derived
 const pluginToInstall =
-  "/Users/samwillis/code/github.com/samjwillis97/shc-2/plugins/shc-plugin-test";
+  // "/Users/samwillis/code/github.com/samjwillis97/shc-2/plugins/shc-plugin-test";
+  "/Users/samuel.willis/code/github.com/samjwillis97/shc-2/main/plugins/shc-plugin-test";
 
 const getPluginDirectory = async () => {
   const dir = path.join(
@@ -111,27 +115,71 @@ function getYarnPath() {
   return path.resolve(getAppDir(), "../bin/yarn-standalone.js");
 }
 
-const findPlugins = async () => {
+const findAllPluginDirs = async () => {
   const pluginDir = await getPluginDirectory();
   await mkdir(pluginDir, { recursive: true });
+  return [pluginDir];
+};
 
-  const paths = [pluginDir];
-
-  for (const path of paths) {
-    if (!existsSync(path)) {
+const resolvePlugins = async (paths: string[]) => {
+  for (const pluginPath of paths) {
+    if (!existsSync(pluginPath)) {
       continue;
     }
-    const folders = (await readdir(path)).filter((f) =>
-      f.startsWith("shc-plugin-"),
-    );
-    console.log(
-      "[plugin] Loading",
-      folders.map((f) => f.replace("shc-plugin-", "")).join(", "),
-    );
+
+    for (const filename of readdirSync(pluginPath)) {
+      try {
+        const modulePath = path.join(pluginPath, filename);
+        const packageJsonPath = path.join(modulePath, "package.json");
+
+        if  (!statSync(modulePath).isDirectory()) continue;
+
+        if (filename.startsWith("@")) {
+          await resolvePlugins([modulePath]);
+        }
+
+        if (!readdirSync(modulePath).includes("package.json")) continue;
+
+        // FIXME:
+        // Delete `require` cache if plugin has been required before
+        // for (const p of Object.keys(global.require.cache)) {
+        //   if (p.indexOf(modulePath) === 0) {
+        //     delete global.require.cache[p];
+        //   }
+        // }
+
+        const pluginJson = require(packageJsonPath);
+
+        if  (!pluginJson.shc) continue;
+
+        const module = require(modulePath);
+        
+        // TODO: Validate module
+
+        pluginMap[pluginJson.name] = {
+          module,
+          name: pluginJson.name,
+          directory: modulePath,
+        };
+
+        console.log(`[plugin] Loaded ${pluginJson.name} from ${modulePath}`)
+      } catch (err) {
+        console.log(err)
+        throw Error(`Failed to load plugin: ${filename}`)
+      }
+    }
+    // const folders = (await readdir(path)).filter((f) =>
+    //   f.startsWith("shc-plugin-"),
+    // );
+    // console.log(
+    //   "[plugin] Loading",
+    //   folders.map((f) => f.replace("shc-plugin-", "")).join(", "),
+    // );
   }
 
   return Object.keys(pluginMap).map((name) => pluginMap[name]);
-};
+}
+
 
 // addPlugin(plugin).then((result) => console.log(result));
 const installPlugin = async (plugin: string) => {
@@ -161,7 +209,12 @@ const installPlugin = async (plugin: string) => {
 
 const run = async () => {
   await installPlugin(pluginToInstall);
-  await findPlugins();
+  const pluginDirs= await findAllPluginDirs();
+  await resolvePlugins(pluginDirs);
+
+  const myPlugin = (pluginMap["shc-plugin-test"].module)
+
+  myPlugin.default();
 };
 
 run().then();
