@@ -17,11 +17,16 @@ export interface Plugin {
 
 const pluginMap: Record<string, Plugin> | undefined = {};
 
-const installPluginToTmpDir = async (pluginInstallName: string) => {
+const installPluginToTmpDir = async (pluginLookupName: string) => {
   return new Promise<{tmpDir: string}>(async (resolve, reject) => {
-    console.log(`[plugins] Installing ${pluginInstallName}`);
+    console.log(`[plugins] Installing ${pluginLookupName}`);
 
-    const tmpDir = path.join(tmpdir(), `${pluginInstallName}`);
+    let pluginTmpPathName = pluginLookupName;
+    if (!pluginLookupName.startsWith('@') && pluginLookupName.includes('@')) {
+      pluginTmpPathName = pluginLookupName.split('@')[0];
+    }
+
+    const tmpDir = path.join(tmpdir(), escape(pluginTmpPathName));
     await mkdir(tmpDir, {recursive: true});
     // TODO: Work out what each flag actually does
     // Looks to make a package json at tmpdir and install plugin beneath
@@ -31,7 +36,7 @@ const installPluginToTmpDir = async (pluginInstallName: string) => {
         '--no-deprecation', // Because Yarn still uses `new Buffer()`
         escape(getYarnPath()),
         'add',
-        pluginInstallName,
+        pluginLookupName,
         '--modules-folder',
         escape(tmpDir),
         '--cwd',
@@ -57,7 +62,7 @@ const installPluginToTmpDir = async (pluginInstallName: string) => {
         // In certain environments electron can exit with error even if the command was performed successfully.
         // Checking for success message in output is a workaround for false errors.
         if (err && !stdout.toString().includes('success')) {
-          reject(new Error(`${pluginInstallName} install error: ${err.message}`));
+          reject(new Error(`${pluginLookupName} install error: ${err.message}`));
           return;
         }
 
@@ -141,28 +146,21 @@ const findAllPluginDirs = async () => {
   return [config.pluginDirectory];
 };
 
-const resolvePluginFromConfig = async (identifier: string) => {
-  if (identifier.startsWith('file://')) {
-    // Filesystem plugin
-  }
-
-  throw new Error(`Unable to resolve plugin: ${identifier}`);
-};
-
 // FIXME: Only install if missing or version is different
 export const installPlugin = async (plugin: string) => {
   const config = getConfig();
 
-  // TODO: Resolve what type of plugin it is
-  // This would result in pluginName, and
-  resolvePluginFromConfig(plugin);
-  const pluginPathName = plugin;
+  // TODO: Validate plugin which will get some info on it like moduleName - somehow
+  let moduleName = plugin;
+  if (!plugin.startsWith('@') && plugin.includes('@')) {
+    moduleName = plugin.split('@')[0];
+  }
 
   const {tmpDir} = await installPluginToTmpDir(plugin);
 
-  const pluginDir = path.join(config.pluginDirectory, pluginPathName);
+  const pluginDir = path.join(config.pluginDirectory, moduleName);
   console.log(`[plugins] Moving plugin from ${tmpDir} to ${pluginDir}`);
-  await cp(path.join(tmpDir, pluginPathName), pluginDir, {
+  await cp(path.join(tmpDir, moduleName), pluginDir, {
     recursive: true,
     verbatimSymlinks: true,
   });
@@ -173,7 +171,7 @@ export const installPlugin = async (plugin: string) => {
   for (const filename of await readdir(tmpDir)) {
     const src = path.join(tmpDir, filename);
     const file = await stat(src);
-    if (filename === pluginPathName || !file.isDirectory()) {
+    if (filename === plugin || !file.isDirectory()) {
       continue;
     }
 

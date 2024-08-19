@@ -1,5 +1,7 @@
 {
-  "name": "",
-  "plugins": ["file://Users/samwillis/code/github.com/samjwillis97/shc-2/plugins/shc-plugin-url-builder"],
+  "name": "example-workspace-config",
+  "plugins": [
+    "shc-plugin-url-builder@file:/Users/samuel.willis/code/github.com/samjwillis97/shc-2/main/plugins/shc-plugin-url-builder"
+  ],
   "baseUri": "{{build-url}}"
 }

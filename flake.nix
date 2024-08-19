@@ -32,7 +32,7 @@
           inherit packages buildInputs nativeBuildInputs;
 
           shellHook = ''
-            export PATH=$PATH:$PWD/node_modules/.bin
+            export PATH=$PATH:$PWD/api/node_modules/.bin
           '';
         };
       }

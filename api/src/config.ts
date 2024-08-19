@@ -21,14 +21,15 @@ export const ShcApiConfigSchema = z.object({
 });
 
 export const CollectionConfigSchema = {
+  plugins: z.array(z.string()),
   workspaces: z.array(z.string()),
 };
 
-export const WorkspaceConfigSchema = {
+export const WorkspaceConfigSchema = z.object({
   name: z.string(),
   plugins: z.array(z.string()),
   baseUri: z.string(),
-};
+});
 
 // const getConfigDefaultPath = () => {
 //   if (!process.env.HOME) throw new Error('Unsupported system');
