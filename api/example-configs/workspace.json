@@ -1,0 +1,5 @@
+{
+  "name": "",
+  "plugins": ["file://Users/samwillis/code/github.com/samjwillis97/shc-2/plugins/shc-plugin-url-builder"],
+  "baseUri": "{{build-url}}"
+}

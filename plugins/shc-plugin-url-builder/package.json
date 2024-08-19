@@ -1,0 +1,13 @@
+{
+  "name": "shc-plugin-test",
+  "version": "1.0.0",
+  "main": "index.js",
+  "shc": {
+    "name": "test-plugin",
+    "displayName": "test plugin",
+    "description": "this is just a test plugin"
+  },
+  "dependencies": {
+    "zod": "^3.23.8"
+  }
+}
