@@ -279,6 +279,7 @@ export const installPlugin = async (plugin: string) => {
   }
 };
 
+// TODO: I think this should have the option of only loading required plugins
 export const loadPlugins = async (force?: boolean) => {
   if (Object.keys(pluginMap).length === 0 || force) {
     const dirs = await findAllPluginDirs();
