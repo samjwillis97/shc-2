@@ -16,6 +16,7 @@ const run = async () => {
   }
 
   const plugins = await loadPlugins();
+  console.log(plugins);
   const myPlugin = plugins['url-builder'].module;
   console.log(myPlugin);
 

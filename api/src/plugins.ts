@@ -6,6 +6,9 @@ import {getConfig, getYarnPath} from './config';
 import {existsSync, readdirSync, statSync} from 'fs';
 
 export interface Module {
+  'pre-request-hooks': {
+    [key: string]: () => string;
+  };
   'template-handlers': {
     [key: string]: () => string;
   };
