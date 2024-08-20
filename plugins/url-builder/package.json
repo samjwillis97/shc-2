@@ -1,9 +1,8 @@
 {
-  "name": "shc-plugin-url-builder",
+  "name": "url-builder",
   "version": "1.0.0",
   "main": "index.js",
   "shc": {
-    "name": "url-builder",
     "displayName": "URL builder plugin",
     "description": "this is just a test plugin"
   },

@@ -20,7 +20,8 @@ export interface Plugin {
 export interface ShcPlugin {
   name: string;
   shc: {
-    name: string;
+    displayName: string;
+    description: string;
   };
   version: string;
   dist: unknown;
@@ -178,6 +179,14 @@ const installPluginToTmpDir = async (pluginLookupName: string) => {
   });
 };
 
+/**
+ * Recursively resolve plugins in given paths
+ * Validation is done by making sure a `package.json` is included
+ * and that it has a `shc` key within.
+ *
+ * The plugin map will use the `shc.name` as the key and the plugin object as the value.
+ *
+ */
 const resolvePlugins = async (paths: string[]) => {
   for (const pluginPath of paths) {
     if (!existsSync(pluginPath)) {
@@ -221,19 +230,12 @@ const resolvePlugins = async (paths: string[]) => {
           directory: modulePath,
         };
 
-        console.log(`[plugin] Loaded ${pluginJson.name} from ${modulePath}`);
+        console.log(`[plugins] Loaded ${pluginJson.name} from ${modulePath}`);
       } catch (err) {
         console.log(err);
         throw Error(`Failed to load plugin: ${filename}`);
       }
     }
-    // const folders = (await readdir(path)).filter((f) =>
-    //   f.startsWith("shc-plugin-"),
-    // );
-    // console.log(
-    //   "[plugin] Loading",
-    //   folders.map((f) => f.replace("shc-plugin-", "")).join(", "),
-    // );
   }
 
   return Object.keys(pluginMap).map((name) => pluginMap[name]);
