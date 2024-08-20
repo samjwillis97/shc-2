@@ -185,6 +185,7 @@ const installPluginToTmpDir = async (pluginLookupName: string) => {
  * and that it has a `shc` key within.
  *
  * The plugin map will use the `shc.name` as the key and the plugin object as the value.
+ * When inserting in the pluginMap
  *
  */
 const resolvePlugins = async (paths: string[]) => {
