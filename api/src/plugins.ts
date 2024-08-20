@@ -6,7 +6,9 @@ import {getConfig, getYarnPath} from './config';
 import {existsSync, readdirSync, statSync} from 'fs';
 
 export interface Module {
-  'template-handlers': () => string;
+  'template-handlers': {
+    [key: string]: () => string;
+  };
 }
 
 export interface Plugin {
@@ -116,7 +118,7 @@ const resolvePlugins = async (paths: string[]) => {
 
         // TODO: Validate module
 
-        pluginMap[pluginJson.name] = {
+        pluginMap[pluginJson.shc.name] = {
           module,
           name: pluginJson.name,
           directory: modulePath,

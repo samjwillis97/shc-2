@@ -1,5 +1,5 @@
 exports["template-handlers"] = {
-  "build-url": () => {
+  build: () => {
     return "http://localhost:3000/";
   },
 };

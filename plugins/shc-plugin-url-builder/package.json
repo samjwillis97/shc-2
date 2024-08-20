@@ -1,10 +1,10 @@
 {
-  "name": "shc-plugin-test",
+  "name": "shc-plugin-url-builder",
   "version": "1.0.0",
   "main": "index.js",
   "shc": {
-    "name": "test-plugin",
-    "displayName": "test plugin",
+    "name": "url-builder",
+    "displayName": "URL builder plugin",
     "description": "this is just a test plugin"
   },
   "dependencies": {

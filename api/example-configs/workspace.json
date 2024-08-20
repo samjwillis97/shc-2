@@ -3,5 +3,5 @@
   "plugins": [
     "shc-plugin-url-builder@file:/Users/samuel.willis/code/github.com/samjwillis97/shc-2/main/plugins/shc-plugin-url-builder"
   ],
-  "baseUri": "{{build-url}}"
+  "baseUri": "{{url-builder.build}}"
 }
