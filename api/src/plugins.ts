@@ -225,7 +225,7 @@ const resolvePlugins = async (paths: string[]) => {
 
         // TODO: Validate module
 
-        pluginMap[pluginJson.shc.name] = {
+        pluginMap[pluginJson.name] = {
           module,
           name: pluginJson.name,
           directory: modulePath,
