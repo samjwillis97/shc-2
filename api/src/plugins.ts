@@ -1,4 +1,4 @@
-import {cp, mkdir, readdir, stat} from 'fs/promises';
+import {cp, mkdir, readdir, readFile, stat} from 'fs/promises';
 import {tmpdir} from 'os';
 import path from 'path';
 import childProcess from 'child_process';
@@ -17,7 +17,104 @@ export interface Plugin {
   module: Module;
 }
 
+export interface ShcPlugin {
+  name: string;
+  shc: {
+    name: string;
+  };
+  version: string;
+  dist: unknown;
+}
+
 const pluginMap: Record<string, Plugin> | undefined = {};
+
+const validateModuleJson = (moduleJson: string) => {
+  try {
+    // TODO: zodify
+    const data = JSON.parse(moduleJson);
+
+    if (!data || !data.shc) {
+      throw new Error('Failed to parse module info');
+    }
+
+    console.log(`[plugins] Detected SHC plugin ${data.name}`);
+
+    return {
+      shc: data.shc,
+      name: data.name,
+      version: data.version,
+      dist: data.dist,
+    };
+  } catch (err) {
+    throw new Error(`Failed to parse module info`);
+  }
+};
+
+const isShcPlugin = async (pluginLookupName: string) => {
+  if (pluginLookupName.includes('@file:')) {
+    // this is a file plugin, just return the local package json
+    const pluginPath = pluginLookupName.split('@file:')[1];
+    const jsonPath = path.join(pluginPath, 'package.json');
+    return validateModuleJson(await readFile(jsonPath, 'utf8'));
+  }
+  return new Promise<ShcPlugin>((resolve, reject) => {
+    console.log('[plugins] Fetching module info from npm');
+
+    childProcess.execFile(
+      process.execPath,
+      [
+        '--no-deprecation', // Because Yarn still uses `new Buffer()`
+        escape(getYarnPath()),
+        'info',
+        pluginLookupName,
+        '--json',
+      ],
+      {
+        timeout: 5 * 60 * 1000,
+        maxBuffer: 1024 * 1024,
+        shell: true, // Some package installs require a shell
+        env: {
+          NODE_ENV: 'production',
+          // ELECTRON_RUN_AS_NODE: "true",
+        },
+      },
+      (err, stdout, stderr) => {
+        if (err) {
+          reject(new Error(`npm error: ${err.message}`));
+          return;
+        }
+
+        if (stderr) {
+          reject(new Error(`Yarn error ${stderr.toString()}`));
+          return;
+        }
+
+        try {
+          // TODO: zodify
+          const data = JSON.parse(stdout.toString()).output;
+          console.log(`[plugin data]`, data);
+
+          if (!data) {
+            reject(new Error('Failed to parse module info'));
+            return;
+          }
+
+          console.log(`[plugins] Deteceted SHC plugin ${data.name}`);
+
+          resolve({
+            shc: data.shc,
+            name: data.name,
+            version: data.version,
+            dist: data.dist,
+          });
+        } catch (ex) {
+          // @ts-expect-error - unknown error, FIXME
+          reject(new Error(`Failed to parse module info: ${ex.message}`));
+        }
+      },
+    );
+  });
+};
 
 const installPluginToTmpDir = async (pluginLookupName: string) => {
   return new Promise<{tmpDir: string}>(async (resolve, reject) => {
@@ -152,17 +249,14 @@ const findAllPluginDirs = async () => {
 export const installPlugin = async (plugin: string) => {
   const config = getConfig();
 
-  // TODO: Validate plugin which will get some info on it like moduleName - somehow
-  let moduleName = plugin;
-  if (!plugin.startsWith('@') && plugin.includes('@')) {
-    moduleName = plugin.split('@')[0];
-  }
+  const module = await isShcPlugin(plugin);
 
   const {tmpDir} = await installPluginToTmpDir(plugin);
+  const pluginDir = path.join(config.pluginDirectory, module.name);
 
-  const pluginDir = path.join(config.pluginDirectory, moduleName);
   console.log(`[plugins] Moving plugin from ${tmpDir} to ${pluginDir}`);
-  await cp(path.join(tmpDir, moduleName), pluginDir, {
+
+  await cp(path.join(tmpDir, module.name), pluginDir, {
     recursive: true,
     verbatimSymlinks: true,
   });
