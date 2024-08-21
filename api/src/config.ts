@@ -1,5 +1,6 @@
 import path, {dirname} from 'path';
 import {z} from 'zod';
+import {RunnerParams} from './runner';
 
 const appName = 'shc-2';
 
@@ -21,15 +22,33 @@ export const ShcApiConfigSchema = z.object({
 });
 
 export const CollectionConfigSchema = {
-  plugins: z.array(z.string()),
   workspaces: z.array(z.string()),
 };
 
+export const EndpointConfigSchema = z.object({
+  method: z.enum(['GET']),
+  hooks: z
+    .object({
+      'pre-request': z.array(z.string()).optional(),
+    })
+    .optional(),
+  endpoint: z.string(),
+});
+
+export type EndpointConfig = z.infer<typeof EndpointConfigSchema>;
+
 export const WorkspaceConfigSchema = z.object({
   name: z.string(),
-  plugins: z.array(z.string()),
-  baseUri: z.string(),
+  plugins: z.array(z.string()).optional(),
+  hooks: z
+    .object({
+      'pre-request': z.array(z.string()).optional(),
+    })
+    .optional(),
+  endpoints: z.record(z.string(), EndpointConfigSchema).optional(),
 });
+
+export type WorkspaceConfig = z.infer<typeof WorkspaceConfigSchema>;
 
 // const getConfigDefaultPath = () => {
 //   if (!process.env.HOME) throw new Error('Unsupported system');
@@ -68,4 +87,15 @@ export const getConfig = (configJson: string = '{}', force?: boolean) => {
   }
 
   return config;
+};
+
+export const mergeConfigsToRunnerParams = (workspace: WorkspaceConfig, endpoint: EndpointConfig): RunnerParams => {
+  return {
+    method: endpoint.method,
+    endpoint: endpoint.endpoint,
+    hooks: {
+      'pre-request': [...(workspace.hooks?.['pre-request'] ?? []), ...(endpoint.hooks?.['pre-request'] ?? [])],
+    },
+    plugins: workspace.plugins ?? [],
+  };
 };

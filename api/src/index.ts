@@ -1,6 +1,6 @@
 import {readFileSync} from 'fs';
 import {installPlugin, loadPlugins} from './plugins';
-import {WorkspaceConfigSchema} from './config';
+import {mergeConfigsToRunnerParams, WorkspaceConfigSchema} from './config';
 
 const run = async () => {
   const workspaceConfigFile = readFileSync('./example-configs/workspace.json', 'utf8');
@@ -11,14 +11,23 @@ const run = async () => {
 
   const workspaceConfig = workspaceConfigParsed.data;
 
-  for (const plugin of workspaceConfig.plugins) {
-    await installPlugin(plugin);
+  // TODO: Maybe automate some of the plugin stuff when parsing the config?
+  if (workspaceConfig.plugins) {
+    for (const plugin of workspaceConfig.plugins) {
+      await installPlugin(plugin);
+    }
+    // const plugins = await loadPlugins();
+    await loadPlugins();
   }
 
-  const plugins = await loadPlugins();
-  console.log(plugins);
-  const myPlugin = plugins['url-builder'].module;
-  console.log(myPlugin);
+  const selectedEndpoint = workspaceConfig.endpoints?.getSomething;
+
+  if (!selectedEndpoint) {
+    throw new Error('Missing endpoint');
+  }
+
+  const runParams = mergeConfigsToRunnerParams(workspaceConfig, selectedEndpoint);
+  console.log(runParams);
 
   // myPlugin.default();
 };
