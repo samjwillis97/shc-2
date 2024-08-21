@@ -1,9 +1,8 @@
 {
-  "name": "shc-plugin-test",
+  "name": "my-auth",
   "version": "1.0.0",
   "main": "index.js",
   "shc": {
-    "name": "test-plugin",
     "displayName": "test plugin",
     "description": "this is just a test plugin"
   },

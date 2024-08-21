@@ -262,11 +262,15 @@ export const installPlugin = async (plugin: string) => {
 
   console.log(`[plugins] Moving plugin from ${tmpDir} to ${pluginDir}`);
 
-  await cp(path.join(tmpDir, module.name), pluginDir, {
-    recursive: true,
-    verbatimSymlinks: true,
-  });
-
+  try {
+    await cp(path.join(tmpDir, module.name), pluginDir, {
+      recursive: true,
+      verbatimSymlinks: true,
+    });
+  } catch (err) {
+    console.log(err);
+    throw new Error(`Failed to move plugin, name in the package.json may be incorrect`);
+  }
   // Move each dependency into node_modules folder
   const pluginModulesDir = path.join(pluginDir, 'node_modules');
   await mkdir(pluginModulesDir, {recursive: true});
@@ -283,6 +287,7 @@ export const installPlugin = async (plugin: string) => {
 };
 
 // TODO: I think this should have the option of only loading required plugins
+// TODO: Validate versions of plugins are correct if specified
 export const loadPlugins = async (force?: boolean) => {
   if (Object.keys(pluginMap).length === 0 || force) {
     const dirs = await findAllPluginDirs();

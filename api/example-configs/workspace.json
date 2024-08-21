@@ -1,5 +1,19 @@
 {
   "name": "example-workspace-config",
-  "plugins": ["url-builder@file:/Users/samwillis/code/github.com/samjwillis97/shc-2/plugins/url-builder"],
-  "baseUri": "{{url-builder.build}}"
+  "plugins": [
+    "url-builder@file:/Users/samuel.willis/code/github.com/samjwillis97/shc-2/main/plugins/url-builder",
+    "my-auth@file:/Users/samuel.willis/code/github.com/samjwillis97/shc-2/main/plugins/my-auth"
+  ],
+  "variables": {
+    "baseUrl": "{{url-builder.build}}"
+  },
+  "hooks": {
+    "pre-request": ["my-auth.authenticate"]
+  },
+  "endpoint": {
+    "getSomething": {
+      "method": "GET",
+      "endpoint": "{{baseUrl}}/something"
+    }
+  }
 }
