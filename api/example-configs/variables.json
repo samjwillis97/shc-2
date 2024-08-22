@@ -1,0 +1,6 @@
+{
+  "plugins": ["url-builder@file:/Users/samwillis/code/github.com/samjwillis97/shc-2/plugins/url-builder"],
+  "variables": {
+    "baseUrl": "{{url-builder.build}}"
+  }
+}

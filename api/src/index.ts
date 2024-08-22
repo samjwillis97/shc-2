@@ -1,9 +1,13 @@
 import {readFileSync} from 'fs';
-import {installPlugin, loadPlugins} from './plugins';
-import {mergeConfigsToRunnerParams, WorkspaceConfigSchema} from './config';
+// import {installPlugin, loadPlugins} from './plugins';
+// import {mergeConfigsToRunnerParams, resolveImports, WorkspaceConfigSchema} from './config';
+import {cwd} from 'process';
+import path from 'path';
+import {resolveImports, WorkspaceConfigSchema} from './config';
 
 const run = async () => {
-  const workspaceConfigFile = readFileSync('./example-configs/workspace.json', 'utf8');
+  const configPath = path.join(cwd(), 'example-configs/workspace.json');
+  const workspaceConfigFile = readFileSync(configPath, 'utf8');
   const workspaceConfigParsed = WorkspaceConfigSchema.safeParse(JSON.parse(workspaceConfigFile));
   if (workspaceConfigParsed.success === false) {
     throw new Error('Failed to read workspace config');
@@ -11,25 +15,29 @@ const run = async () => {
 
   const workspaceConfig = workspaceConfigParsed.data;
 
-  // TODO: Maybe automate some of the plugin stuff when parsing the config?
-  if (workspaceConfig.plugins) {
-    for (const plugin of workspaceConfig.plugins) {
-      await installPlugin(plugin);
-    }
-    // const plugins = await loadPlugins();
-    await loadPlugins();
-  }
+  resolveImports(configPath, workspaceConfig);
 
-  const selectedEndpoint = workspaceConfig.endpoints?.getSomething;
+  return;
 
-  if (!selectedEndpoint) {
-    throw new Error('Missing endpoint');
-  }
+  // // TODO: Maybe automate some of the plugin stuff when parsing the config?
+  // if (workspaceConfig.plugins) {
+  //   for (const plugin of workspaceConfig.plugins) {
+  //     await installPlugin(plugin);
+  //   }
+  //   // const plugins = await loadPlugins();
+  //   await loadPlugins();
+  // }
 
-  const runParams = mergeConfigsToRunnerParams(workspaceConfig, selectedEndpoint);
-  console.log(runParams);
+  // const selectedEndpoint = workspaceConfig.endpoints?.getSomething;
 
-  // myPlugin.default();
+  // if (!selectedEndpoint) {
+  //   throw new Error('Missing endpoint');
+  // }
+
+  // const runParams = mergeConfigsToRunnerParams(workspaceConfig, selectedEndpoint);
+  // console.log(runParams);
+
+  // // myPlugin.default();
 };
 
 run().then();

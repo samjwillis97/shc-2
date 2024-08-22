@@ -21,10 +21,6 @@ export const ShcApiConfigSchema = z.object({
     ),
 });
 
-export const CollectionConfigSchema = {
-  workspaces: z.array(z.string()),
-};
-
 export const EndpointConfigSchema = z.object({
   method: z.enum(['GET']),
   hooks: z
@@ -38,6 +34,7 @@ export const EndpointConfigSchema = z.object({
 export type EndpointConfig = z.infer<typeof EndpointConfigSchema>;
 
 export const WorkspaceConfigSchema = z.object({
+  imports: z.array(z.string()).optional(),
   name: z.string(),
   plugins: z.array(z.string()).optional(),
   hooks: z
@@ -88,6 +85,19 @@ export const getConfig = (configJson: string = '{}', force?: boolean) => {
 
   return config;
 };
+
+export const resolveImports = (configPath: string, config: WorkspaceConfig) => {
+  console.log('RESOLVING IMPORTS');
+  const configDirectory = configPath.substring(0, configPath.lastIndexOf(path.sep));
+  if (!config.imports) return config;
+  for (const toImport of config.imports) {
+    console.log(path.join(configDirectory, toImport));
+  }
+
+  return config;
+};
+
+// const mergeImport = (config: WorkspaceConfig, imported: WorkspaceConfig) => {};
 
 export const mergeConfigsToRunnerParams = (workspace: WorkspaceConfig, endpoint: EndpointConfig): RunnerParams => {
   return {
