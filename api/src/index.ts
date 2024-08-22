@@ -2,13 +2,8 @@ import {readFileSync} from 'fs';
 import {installPlugin, loadPlugins} from './plugins';
 import {cwd} from 'process';
 import path from 'path';
-import {
-  mergeConfigsToRunnerParams,
-  ConfigImport,
-  resolveImports,
-  WorkspaceConfig,
-  WorkspaceConfigSchema,
-} from './config';
+import {ConfigImport, WorkspaceConfig, WorkspaceConfigSchema} from './types';
+import {mergeConfigsToRunnerParams, resolveImports} from './config';
 
 const run = async () => {
   const configPath = path.join(cwd(), 'example-configs/workspace.json');

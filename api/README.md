@@ -2,6 +2,9 @@
 
 ## Some thoughts
 
+- Resolving template string orders
+    - variables
+    - the rest
 - Imports
     - import and merge another config file
 - Plugins can;
