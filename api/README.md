@@ -4,6 +4,7 @@
 
 - Plugins can;
     - define/use variables
+    - what if I want one to ask for user input? like a token
 - How to handle variables, are variable _sets_ still the go?
 - Make a cache available in the context object passed to functions
 - Templating?
