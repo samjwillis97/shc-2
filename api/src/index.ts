@@ -1,9 +1,14 @@
 import {readFileSync} from 'fs';
-// import {installPlugin, loadPlugins} from './plugins';
-// import {mergeConfigsToRunnerParams, resolveImports, WorkspaceConfigSchema} from './config';
+import {installPlugin, loadPlugins} from './plugins';
 import {cwd} from 'process';
 import path from 'path';
-import {resolveImports, WorkspaceConfigSchema} from './config';
+import {
+  mergeConfigsToRunnerParams,
+  ConfigImport,
+  resolveImports,
+  WorkspaceConfig,
+  WorkspaceConfigSchema,
+} from './config';
 
 const run = async () => {
   const configPath = path.join(cwd(), 'example-configs/workspace.json');
@@ -13,31 +18,28 @@ const run = async () => {
     throw new Error('Failed to read workspace config');
   }
 
-  const workspaceConfig = workspaceConfigParsed.data;
+  let workspaceConfig: ConfigImport | WorkspaceConfig = workspaceConfigParsed.data;
+  workspaceConfig = resolveImports(configPath, workspaceConfig);
 
-  resolveImports(configPath, workspaceConfig);
+  // TODO: Maybe automate some of the plugin stuff when parsing the config?
+  if (workspaceConfig.plugins) {
+    for (const plugin of workspaceConfig.plugins) {
+      await installPlugin(plugin);
+    }
+    // const plugins = await loadPlugins();
+    await loadPlugins();
+  }
 
-  return;
+  const selectedEndpoint = workspaceConfig.endpoints?.getSomething;
 
-  // // TODO: Maybe automate some of the plugin stuff when parsing the config?
-  // if (workspaceConfig.plugins) {
-  //   for (const plugin of workspaceConfig.plugins) {
-  //     await installPlugin(plugin);
-  //   }
-  //   // const plugins = await loadPlugins();
-  //   await loadPlugins();
-  // }
+  if (!selectedEndpoint) {
+    throw new Error('Missing endpoint');
+  }
 
-  // const selectedEndpoint = workspaceConfig.endpoints?.getSomething;
+  const runParams = mergeConfigsToRunnerParams(workspaceConfig, selectedEndpoint);
+  console.log(runParams);
 
-  // if (!selectedEndpoint) {
-  //   throw new Error('Missing endpoint');
-  // }
-
-  // const runParams = mergeConfigsToRunnerParams(workspaceConfig, selectedEndpoint);
-  // console.log(runParams);
-
-  // // myPlugin.default();
+  // myPlugin.default();
 };
 
 run().then();

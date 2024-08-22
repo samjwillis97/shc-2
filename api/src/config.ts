@@ -1,6 +1,8 @@
 import path, {dirname} from 'path';
 import {z} from 'zod';
 import {RunnerParams} from './runner';
+import {readFileSync} from 'fs';
+import merge from 'deepmerge';
 
 const appName = 'shc-2';
 
@@ -43,9 +45,24 @@ export const WorkspaceConfigSchema = z.object({
     })
     .optional(),
   endpoints: z.record(z.string(), EndpointConfigSchema).optional(),
+  variables: z.record(z.string(), z.string()).optional(),
 });
 
 export type WorkspaceConfig = z.infer<typeof WorkspaceConfigSchema>;
+
+export const ConfigImportSchema = z.object({
+  imports: z.array(z.string()).optional(),
+  plugins: z.array(z.string()).optional(),
+  hooks: z
+    .object({
+      'pre-request': z.array(z.string()).optional(),
+    })
+    .optional(),
+  endpoints: z.record(z.string(), EndpointConfigSchema).optional(),
+  variables: z.record(z.string(), z.string()).optional(),
+});
+
+export type ConfigImport = z.infer<typeof ConfigImportSchema>;
 
 // const getConfigDefaultPath = () => {
 //   if (!process.env.HOME) throw new Error('Unsupported system');
@@ -86,12 +103,29 @@ export const getConfig = (configJson: string = '{}', force?: boolean) => {
   return config;
 };
 
-export const resolveImports = (configPath: string, config: WorkspaceConfig) => {
-  console.log('RESOLVING IMPORTS');
+// TODO: Type for config post import
+export const resolveImports = (
+  configPath: string,
+  config: WorkspaceConfig | ConfigImport,
+): WorkspaceConfig | ConfigImport => {
   const configDirectory = configPath.substring(0, configPath.lastIndexOf(path.sep));
   if (!config.imports) return config;
   for (const toImport of config.imports) {
-    console.log(path.join(configDirectory, toImport));
+    const importPath = path.join(configDirectory, toImport);
+    const imported = readFileSync(importPath, 'utf8');
+    const parsedImport = ConfigImportSchema.safeParse(JSON.parse(imported));
+    if (parsedImport.success === false) {
+      throw new Error('Failed to parse import');
+    }
+
+    let importConfig = parsedImport.data;
+
+    if (importConfig.imports) {
+      importConfig = resolveImports(importPath, importConfig);
+    }
+    delete importConfig.imports;
+
+    config = merge(config, importConfig);
   }
 
   return config;
@@ -99,7 +133,10 @@ export const resolveImports = (configPath: string, config: WorkspaceConfig) => {
 
 // const mergeImport = (config: WorkspaceConfig, imported: WorkspaceConfig) => {};
 
-export const mergeConfigsToRunnerParams = (workspace: WorkspaceConfig, endpoint: EndpointConfig): RunnerParams => {
+export const mergeConfigsToRunnerParams = (
+  workspace: WorkspaceConfig | ConfigImport,
+  endpoint: EndpointConfig,
+): RunnerParams => {
   return {
     method: endpoint.method,
     endpoint: endpoint.endpoint,

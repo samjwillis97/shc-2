@@ -1,10 +1,7 @@
 {
   "name": "example-workspace-config",
   "imports": ["./variables.json"],
-  "plugins": [
-    "url-builder@file:/Users/samwillis/code/github.com/samjwillis97/shc-2/plugins/url-builder",
-    "my-auth@file:/Users/samwillis/code/github.com/samjwillis97/shc-2/plugins/my-auth"
-  ],
+  "plugins": ["my-auth@file:/Users/samwillis/code/github.com/samjwillis97/shc-2/plugins/my-auth"],
   "variables": {
     "baseUrl": "{{url-builder.build}}"
   },
