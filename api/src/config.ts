@@ -10,6 +10,7 @@ import {
   WorkspaceConfig,
   RunnerParams,
 } from './types';
+import {loadPlugins} from './plugins';
 
 let config: z.infer<typeof ShcApiConfigSchema> | undefined = undefined;
 
@@ -80,7 +81,21 @@ export const resolveImports = (
   return config;
 };
 
-// const mergeImport = (config: WorkspaceConfig, imported: WorkspaceConfig) => {};
+export const resolveTemplates = async (config: WorkspaceConfig | ConfigImport, endpoint: EndpointConfig) => {
+  console.log(config);
+  console.log(endpoint);
+
+  const plugins = await loadPlugins();
+  const pluginNames = Object.keys(plugins);
+  const variableNames = Object.keys(config.variables ?? {});
+
+  // Only want to resolve variables that are required
+
+  console.log(pluginNames);
+
+  console.log('Templates RESOLVED');
+  return {workspace: config, endpoint};
+};
 
 export const mergeConfigsToRunnerParams = (
   workspace: WorkspaceConfig | ConfigImport,

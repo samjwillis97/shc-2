@@ -15,3 +15,4 @@
 - Make a cache available in the context object passed to functions
 - Templating?
     - I guess just recrusively traversing strings, with exceptions
+- I really should remove plugins, or something
