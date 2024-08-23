@@ -11,6 +11,7 @@ import {
   RunnerParams,
 } from './types';
 import {loadPlugins} from './plugins';
+import {resolveTemplateInString} from './templates';
 
 let config: z.infer<typeof ShcApiConfigSchema> | undefined = undefined;
 
@@ -81,20 +82,22 @@ export const resolveImports = (
   return config;
 };
 
-export const resolveTemplates = async (config: WorkspaceConfig | ConfigImport, endpoint: EndpointConfig) => {
+export const resolveTemplates = async (config: WorkspaceConfig | ConfigImport, toRun: RunnerParams) => {
   console.log(config);
-  console.log(endpoint);
+  console.log(toRun);
 
   const plugins = await loadPlugins();
   const pluginNames = Object.keys(plugins);
   const variableNames = Object.keys(config.variables ?? {});
 
   // Only want to resolve variables that are required
-
   console.log(pluginNames);
+  console.log(variableNames);
+
+  console.log(resolveTemplateInString(toRun.endpoint));
 
   console.log('Templates RESOLVED');
-  return {workspace: config, endpoint};
+  return {workspace: config, runnerParams: toRun};
 };
 
 export const mergeConfigsToRunnerParams = (

@@ -67,3 +67,5 @@ export const ConfigImportSchema = z.object({
 });
 
 export type ConfigImport = z.infer<typeof ConfigImportSchema>;
+
+export type ResolvedConfig = WorkspaceConfig | ConfigImport;

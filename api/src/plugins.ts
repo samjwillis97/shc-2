@@ -296,3 +296,8 @@ export const loadPlugins = async (force?: boolean) => {
 
   return pluginMap;
 };
+
+export const getPlugin = (name: string) => {
+  if (!pluginMap[name]) return undefined;
+  return pluginMap[name];
+};
