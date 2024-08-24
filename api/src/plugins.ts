@@ -253,6 +253,7 @@ const findAllPluginDirs = async () => {
 
 // FIXME: Only install if missing or version is different
 export const installPlugin = async (plugin: string) => {
+  console.log(`[plugins] Installing ${plugin}`);
   const config = getConfig();
 
   const module = await isShcPlugin(plugin);
