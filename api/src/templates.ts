@@ -20,8 +20,6 @@ export const resolveTemplates = <T extends object | string>(thing: T): T => {
       }
       break;
   }
-  // Only want to resolve variables that are required
-  // console.log(resolveTemplateInString(toRun.endpoint));
 
   return thing;
 };
