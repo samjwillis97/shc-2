@@ -5,10 +5,8 @@ export const resolveTemplates = <T extends object | string>(thing: T): T => {
   if (thing === undefined || thing === null) return thing;
   switch (typeof thing) {
     case 'string':
-      console.log(`Replace: ${thing}`);
       // @ts-expect-error - IDK this is so painful
       thing = resolveTemplateInString(thing);
-      console.log(`With: ${thing}`);
       break;
     case 'object':
       if (Array.isArray(thing)) {

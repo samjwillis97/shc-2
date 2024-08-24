@@ -16,7 +16,7 @@
     }
   },
   "hooks": {
-    "pre-request": ["my-auth.authenticate"]
+    "pre-request": ["my-auth.auth"]
   },
   "endpoints": {
     "getSomething": {
