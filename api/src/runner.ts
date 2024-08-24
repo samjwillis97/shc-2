@@ -1,6 +1,10 @@
 import {getPlugin} from './plugins';
 import {RunnerParams} from './types';
 
+type RunnerContext = {
+  req: Request;
+};
+
 const executeHooks = (hooks: string[]) => {
   for (const hook of hooks) {
     const [pluginName, methodName] = hook.split('.');
@@ -12,8 +16,15 @@ const executeHooks = (hooks: string[]) => {
 };
 
 export const run = async (params: RunnerParams) => {
+  const context: RunnerContext = {
+    req: new Request(params.endpoint),
+  };
+
   const {hooks} = params;
   if (hooks) {
     executeHooks(hooks['pre-request']);
   }
+
+  const response = await fetch(context.req);
+  console.log(response);
 };

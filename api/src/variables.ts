@@ -12,7 +12,6 @@ export const extractVariables = (config: ResolvedConfig) => {
 };
 
 export const getVariable = (variable: string) => {
-  console.log(`Getting var: ${variable}`);
   variable = variables[variable];
   if (!variable) {
     return '';
