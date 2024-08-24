@@ -3,8 +3,10 @@ import {installPlugin, loadPlugins} from './plugins';
 import {cwd} from 'process';
 import path from 'path';
 import {ConfigImport, WorkspaceConfig, WorkspaceConfigSchema} from './types';
-import {mergeConfigsToRunnerParams, resolveImports, resolveTemplates} from './config';
+import {mergeConfigsToRunnerParams, resolveImports} from './config';
 import {extractVariables} from './variables';
+import {resolveTemplates} from './templates';
+import {run as execute} from './runner';
 
 const run = async () => {
   const configPath = path.join(cwd(), 'example-configs/workspace.json');
@@ -23,7 +25,6 @@ const run = async () => {
     for (const plugin of workspaceConfig.plugins) {
       await installPlugin(plugin);
     }
-    // const plugins = await loadPlugins();
     await loadPlugins();
   }
 
@@ -33,11 +34,8 @@ const run = async () => {
     throw new Error('Missing endpoint');
   }
 
-  const runParams = mergeConfigsToRunnerParams(workspaceConfig, selectedEndpoint);
-  const resolved = await resolveTemplates(workspaceConfig, runParams);
-
-  console.log(resolved);
-  console.log(runParams);
+  const runParams = resolveTemplates(mergeConfigsToRunnerParams(workspaceConfig, selectedEndpoint));
+  execute(runParams);
 
   // myPlugin.default();
 };

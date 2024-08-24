@@ -4,7 +4,6 @@ import {z} from 'zod';
 const appName = 'shc-2';
 
 export interface RunnerParams {
-  plugins?: string[];
   hooks?: {
     'pre-request': string[];
   };
