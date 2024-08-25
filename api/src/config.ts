@@ -89,6 +89,7 @@ export const mergeConfigsToRunnerParams = (
     endpoint: endpoint.endpoint,
     hooks: {
       'pre-request': [...(workspace.hooks?.['pre-request'] ?? []), ...(endpoint.hooks?.['pre-request'] ?? [])],
+      'post-request': [...(workspace.hooks?.['post-request'] ?? []), ...(endpoint.hooks?.['post-request'] ?? [])],
     },
   };
 };

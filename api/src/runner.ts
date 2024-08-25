@@ -21,6 +21,14 @@ export const run = async (params: RunnerParams) => {
     executeHooks(ctx, hooks['pre-request']);
   }
 
-  const response = await fetch(ctx.req);
-  console.log(response);
+  try {
+    const response = await fetch(ctx.req);
+    ctx.res = response;
+    if (hooks) {
+      executeHooks(ctx, hooks['post-request']);
+    }
+  } catch (err) {
+    console.log('Request Failed');
+    console.error(err);
+  }
 };

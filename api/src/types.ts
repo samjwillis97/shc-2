@@ -6,6 +6,7 @@ const appName = 'shc-2';
 export interface RunnerParams {
   hooks?: {
     'pre-request': string[];
+    'post-request': string[];
   };
   endpoint: string;
   method: 'GET';
@@ -31,6 +32,7 @@ export const EndpointConfigSchema = z.object({
   hooks: z
     .object({
       'pre-request': z.array(z.string()).optional(),
+      'post-request': z.array(z.string()).optional(),
     })
     .optional(),
   endpoint: z.string(),
@@ -45,6 +47,7 @@ export const WorkspaceConfigSchema = z.object({
   hooks: z
     .object({
       'pre-request': z.array(z.string()).optional(),
+      'post-request': z.array(z.string()).optional(),
     })
     .optional(),
   endpoints: z.record(z.string(), EndpointConfigSchema).optional(),
@@ -59,6 +62,7 @@ export const ConfigImportSchema = z.object({
   hooks: z
     .object({
       'pre-request': z.array(z.string()).optional(),
+      'post-request': z.array(z.string()).optional(),
     })
     .optional(),
   endpoints: z.record(z.string(), EndpointConfigSchema).optional(),
@@ -71,7 +75,10 @@ export type ResolvedConfig = WorkspaceConfig | ConfigImport;
 
 export interface Module {
   'pre-request-hooks': {
-    [key: string]: (ctx: RunnerContext) => RunnerContext;
+    [key: string]: (ctx: RunnerContext) => void;
+  };
+  'post-request-hooks': {
+    [key: string]: (ctx: RunnerContext) => void;
   };
   'template-handlers': {
     [key: string]: () => string;
@@ -95,4 +102,5 @@ export interface ShcPlugin {
 
 export type RunnerContext = {
   req: Request;
+  res?: Response;
 };

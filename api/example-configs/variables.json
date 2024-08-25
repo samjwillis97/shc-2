@@ -2,6 +2,6 @@
   "imports": ["./nestedImport.json"],
   "plugins": ["shc-plugin-example"],
   "variables": {
-    "baseUrl": "{{example.build}}"
+    "baseUrl": "{{example.httpBinUrl}}"
   }
 }

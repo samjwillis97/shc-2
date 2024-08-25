@@ -3,12 +3,13 @@
   "imports": ["./variables.json"],
   "plugins": ["shc-plugin-example"],
   "hooks": {
-    "pre-request": ["example.auth", "base.logContext"]
+    "pre-request": ["example.auth", "base.logContext"],
+    "post-request": ["base.logContext"]
   },
   "endpoints": {
     "getSomething": {
       "method": "GET",
-      "endpoint": "{{baseUrl}}/something"
+      "endpoint": "{{baseUrl}}/get"
     }
   }
 }
