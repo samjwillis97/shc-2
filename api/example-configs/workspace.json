@@ -1,6 +1,6 @@
 {
   "name": "example-workspace-config",
-  "imports": ["./variables.json"],
+  "imports": ["./variables.json", "./variableGroups.json"],
   "plugins": ["shc-plugin-example"],
   "hooks": {
     "pre-request": ["example.auth", "base.logContext"],

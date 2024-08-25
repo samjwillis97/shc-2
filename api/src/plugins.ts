@@ -1,4 +1,4 @@
-import {cp, mkdir, readdir, readFile, stat} from 'fs/promises';
+import {cp, mkdir, readdir, readFile, rm, stat} from 'fs/promises';
 import {tmpdir} from 'os';
 import path from 'path';
 import childProcess from 'child_process';
@@ -284,4 +284,19 @@ export const loadPlugins = async (force?: boolean) => {
 export const getPlugin = (name: string) => {
   if (!pluginMap[name]) throw new Error(`Unable to get plugin: ${name}`);
   return pluginMap[name];
+};
+
+export const cleanPluginDir = async () => {
+  const config = getConfig();
+  const contents = await readdir(config.pluginDirectory);
+
+  for (const item of contents) {
+    const toDelete = path.join(config.pluginDirectory, item);
+    const info = await stat(toDelete);
+    if (!info.isDirectory()) continue;
+    await rm(toDelete, {
+      recursive: true,
+      force: true,
+    });
+  }
 };

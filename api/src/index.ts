@@ -1,5 +1,5 @@
 import {readFileSync} from 'fs';
-import {installPlugin, loadPlugins} from './plugins';
+import {cleanPluginDir, installPlugin, loadPlugins} from './plugins';
 import {cwd} from 'process';
 import path from 'path';
 import {ConfigImport, WorkspaceConfig, WorkspaceConfigSchema} from './types';
@@ -21,6 +21,7 @@ const run = async () => {
   extractVariables(workspaceConfig);
 
   // TODO: Maybe automate some of the plugin stuff when parsing the config?
+  await cleanPluginDir();
   if (workspaceConfig.plugins) {
     for (const plugin of workspaceConfig.plugins) {
       await installPlugin(plugin);
