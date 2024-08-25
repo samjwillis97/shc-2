@@ -6,10 +6,17 @@
     "pre-request": ["example.auth", "base.logContext"],
     "post-request": ["base.logContext"]
   },
+  "headers": {
+    "Content-Type": "application/json",
+    "first-header": "hard-coded"
+  },
   "endpoints": {
     "getSomething": {
       "method": "GET",
-      "endpoint": "{{baseUrl}}/get"
+      "endpoint": "{{baseUrl}}/get",
+      "headers": {
+        "endpoint-header": "should-be-there"
+      }
     }
   }
 }

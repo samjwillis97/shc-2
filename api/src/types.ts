@@ -4,6 +4,9 @@ import {z} from 'zod';
 const appName = 'shc-2';
 
 export interface RunnerParams {
+  headers: {
+    [key: string]: string;
+  };
   hooks?: {
     'pre-request': string[];
     'post-request': string[];
@@ -29,6 +32,7 @@ export const ShcApiConfigSchema = z.object({
 
 export const EndpointConfigSchema = z.object({
   method: z.enum(['GET']),
+  headers: z.record(z.string(), z.string()).optional(),
   hooks: z
     .object({
       'pre-request': z.array(z.string()).optional(),
@@ -40,25 +44,10 @@ export const EndpointConfigSchema = z.object({
 
 export type EndpointConfig = z.infer<typeof EndpointConfigSchema>;
 
-export const WorkspaceConfigSchema = z.object({
-  imports: z.array(z.string()).optional(),
-  name: z.string(),
-  plugins: z.array(z.string()).optional(),
-  hooks: z
-    .object({
-      'pre-request': z.array(z.string()).optional(),
-      'post-request': z.array(z.string()).optional(),
-    })
-    .optional(),
-  endpoints: z.record(z.string(), EndpointConfigSchema).optional(),
-  variables: z.record(z.string(), z.string()).optional(),
-});
-
-export type WorkspaceConfig = z.infer<typeof WorkspaceConfigSchema>;
-
 export const ConfigImportSchema = z.object({
   imports: z.array(z.string()).optional(),
   plugins: z.array(z.string()).optional(),
+  headers: z.record(z.string(), z.string()).optional(),
   hooks: z
     .object({
       'pre-request': z.array(z.string()).optional(),
@@ -70,6 +59,13 @@ export const ConfigImportSchema = z.object({
 });
 
 export type ConfigImport = z.infer<typeof ConfigImportSchema>;
+
+export const WorkspaceConfigSchema = ConfigImportSchema.and(
+  z.object({
+    name: z.string(),
+  }),
+);
+export type WorkspaceConfig = z.infer<typeof WorkspaceConfigSchema>;
 
 export type ResolvedConfig = WorkspaceConfig | ConfigImport;
 

@@ -16,6 +16,7 @@ export const run = async (params: RunnerParams) => {
     url: params.endpoint,
     req: {
       method: params.method,
+      headers: params.headers,
     },
   };
 
@@ -30,6 +31,7 @@ export const run = async (params: RunnerParams) => {
     if (hooks) {
       executeHooks(ctx, hooks['post-request']);
     }
+    console.log(await response.json());
   } catch (err) {
     console.log('Request Failed');
     console.error(err);
