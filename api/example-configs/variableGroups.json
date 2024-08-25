@@ -1,0 +1,12 @@
+{
+  "variableGroups": {
+    "user": {
+      "name": "test user",
+      "email": "test@tester.com"
+    },
+    "secondUser": {
+      "name": "Second user",
+      "email": "second@tester.com"
+    }
+  }
+}

@@ -15,7 +15,6 @@ export interface Module {
 }
 
 export interface Plugin {
-  name: string;
   directory: string;
   module: Module;
 }
@@ -94,8 +93,7 @@ const isShcPlugin = async (pluginLookupName: string) => {
         }
 
         try {
-          // TODO: zodify
-          const data = JSON.parse(stdout.toString()).output;
+          const data = JSON.parse(stdout.toString()).data;
           console.log(`[plugin data]`, data);
 
           if (!data) {
@@ -103,7 +101,7 @@ const isShcPlugin = async (pluginLookupName: string) => {
             return;
           }
 
-          console.log(`[plugins] Deteceted SHC plugin ${data.name}`);
+          console.log(`[plugins] Detected SHC plugin ${data.shc.id}`);
 
           resolve({
             shc: data.shc,
@@ -228,9 +226,8 @@ const resolvePlugins = async (paths: string[]) => {
 
         // TODO: Validate module
 
-        pluginMap[pluginJson.name] = {
+        pluginMap[pluginJson.shc.id] = {
           module,
-          name: pluginJson.name,
           directory: modulePath,
         };
 

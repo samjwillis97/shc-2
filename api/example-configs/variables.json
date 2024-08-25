@@ -1,7 +1,7 @@
 {
   "imports": ["./nestedImport.json"],
-  "plugins": ["url-builder@file:/Users/samwillis/code/github.com/samjwillis97/shc-2/plugins/url-builder"],
+  "plugins": ["shc-plugin-example@1.0.0-alpha"],
   "variables": {
-    "baseUrl": "{{url-builder.build}}"
+    "baseUrl": "{{example.build}}"
   }
 }

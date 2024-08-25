@@ -1,22 +1,9 @@
 {
   "name": "example-workspace-config",
   "imports": ["./variables.json"],
-  "plugins": ["my-auth@file:/Users/samwillis/code/github.com/samjwillis97/shc-2/plugins/my-auth"],
-  "variables": {
-    "baseUrl": "{{url-builder.build}}"
-  },
-  "variableGroups": {
-    "user": {
-      "name": "test user",
-      "email": "test@tester.com"
-    },
-    "secondUser": {
-      "name": "Second user",
-      "email": "second@tester.com"
-    }
-  },
+  "plugins": ["shc-plugin-example"],
   "hooks": {
-    "pre-request": ["my-auth.auth"]
+    "pre-request": ["example.auth"]
   },
   "endpoints": {
     "getSomething": {
