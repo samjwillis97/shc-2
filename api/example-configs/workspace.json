@@ -15,7 +15,8 @@
       "method": "GET",
       "endpoint": "{{baseUrl}}/get",
       "headers": {
-        "endpoint-header": "should-be-there"
+        "endpoint-header": "should-be-there",
+        "user": "{{user.email}}"
       }
     }
   }

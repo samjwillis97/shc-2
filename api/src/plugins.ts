@@ -6,7 +6,7 @@ import {getConfig, getYarnPath} from './config';
 import {existsSync, readdirSync, statSync} from 'fs';
 import {Plugin, ResolvedConfig, ShcPlugin} from './types';
 import base from './extensions/base';
-import {createModuleFromVariableGroups} from './variableGroups';
+import {createModulesFromVariableGroups} from './variableGroups';
 
 // TODO: Handle clashes by throwing error!
 const pluginMap: Record<string, Plugin> | undefined = {};
@@ -284,7 +284,11 @@ export const loadPlugins = async (force?: boolean) => {
 };
 
 export const loadVariableGroups = (groups: ResolvedConfig['variableGroups']) => {
-  createModuleFromVariableGroups(groups);
+  if (!groups) return;
+  const modules = createModulesFromVariableGroups(groups);
+  for (const name of Object.keys(modules)) {
+    pluginMap[name] = modules[name];
+  }
 };
 
 export const getPlugin = (name: string) => {

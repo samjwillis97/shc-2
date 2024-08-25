@@ -50,6 +50,8 @@ export const VariableGroupSchema = z.object({
   values: z.record(z.string(), z.record(z.string(), z.string())),
 });
 
+export type VariableGroup = z.infer<typeof VariableGroupSchema>;
+
 export const ConfigImportSchema = z.object({
   imports: z.array(z.string()).optional(),
   plugins: z.array(z.string()).optional(),
