@@ -3,7 +3,7 @@
   "imports": ["./variables.json"],
   "plugins": ["shc-plugin-example"],
   "hooks": {
-    "pre-request": ["example.auth"]
+    "pre-request": ["example.auth", "base.logContext"]
   },
   "endpoints": {
     "getSomething": {

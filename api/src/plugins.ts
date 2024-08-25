@@ -5,6 +5,7 @@ import childProcess from 'child_process';
 import {getConfig, getYarnPath} from './config';
 import {existsSync, readdirSync, statSync} from 'fs';
 import {Plugin, ShcPlugin} from './types';
+import base from './extensions/base';
 
 const pluginMap: Record<string, Plugin> | undefined = {};
 
@@ -97,7 +98,7 @@ const isShcPlugin = async (pluginLookupName: string) => {
 
 const installPluginToTmpDir = async (pluginLookupName: string) => {
   return new Promise<{tmpDir: string}>(async (resolve, reject) => {
-    console.log(`[plugins] Installing ${pluginLookupName}`);
+    console.log(`[plugins] Installing ${pluginLookupName} to tmp`);
 
     let pluginTmpPathName = pluginLookupName;
     if (!pluginLookupName.startsWith('@') && pluginLookupName.includes('@')) {
@@ -261,12 +262,20 @@ export const installPlugin = async (plugin: string) => {
   }
 };
 
+const importExtensions = () => {
+  pluginMap['base'] = {
+    directory: '.',
+    module: base,
+  };
+};
+
 // TODO: I think this should have the option of only loading required plugins
 // TODO: Validate versions of plugins are correct if specified
 export const loadPlugins = async (force?: boolean) => {
   if (Object.keys(pluginMap).length === 0 || force) {
     const dirs = await findAllPluginDirs();
     await resolvePlugins(dirs);
+    importExtensions();
   }
 
   return pluginMap;
