@@ -68,3 +68,31 @@ export const ConfigImportSchema = z.object({
 export type ConfigImport = z.infer<typeof ConfigImportSchema>;
 
 export type ResolvedConfig = WorkspaceConfig | ConfigImport;
+
+export interface Module {
+  'pre-request-hooks': {
+    [key: string]: (ctx: RunnerContext) => RunnerContext;
+  };
+  'template-handlers': {
+    [key: string]: () => string;
+  };
+}
+
+export interface Plugin {
+  directory: string;
+  module: Module;
+}
+
+export interface ShcPlugin {
+  name: string;
+  shc: {
+    displayName: string;
+    description: string;
+  };
+  version: string;
+  dist: unknown;
+}
+
+export type RunnerContext = {
+  req: Request;
+};

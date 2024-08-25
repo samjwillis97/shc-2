@@ -4,30 +4,7 @@ import path from 'path';
 import childProcess from 'child_process';
 import {getConfig, getYarnPath} from './config';
 import {existsSync, readdirSync, statSync} from 'fs';
-
-export interface Module {
-  'pre-request-hooks': {
-    [key: string]: () => string;
-  };
-  'template-handlers': {
-    [key: string]: () => string;
-  };
-}
-
-export interface Plugin {
-  directory: string;
-  module: Module;
-}
-
-export interface ShcPlugin {
-  name: string;
-  shc: {
-    displayName: string;
-    description: string;
-  };
-  version: string;
-  dist: unknown;
-}
+import {Plugin, ShcPlugin} from './types';
 
 const pluginMap: Record<string, Plugin> | undefined = {};
 
