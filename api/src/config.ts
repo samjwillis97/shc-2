@@ -9,6 +9,7 @@ import {
   ShcApiConfigSchema,
   WorkspaceConfig,
   RunnerParams,
+  ResolvedConfig,
 } from './types';
 
 let config: z.infer<typeof ShcApiConfigSchema> | undefined = undefined;
@@ -53,10 +54,7 @@ export const getConfig = (configJson: string = '{}', force?: boolean) => {
 };
 
 // TODO: Type for config post import
-export const resolveImports = (
-  configPath: string,
-  config: WorkspaceConfig | ConfigImport,
-): WorkspaceConfig | ConfigImport => {
+export const resolveImports = (configPath: string, config: WorkspaceConfig | ConfigImport): ResolvedConfig => {
   const configDirectory = configPath.substring(0, configPath.lastIndexOf(path.sep));
   if (!config.imports) return config;
   for (const toImport of config.imports) {

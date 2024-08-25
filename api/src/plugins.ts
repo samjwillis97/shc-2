@@ -4,9 +4,11 @@ import path from 'path';
 import childProcess from 'child_process';
 import {getConfig, getYarnPath} from './config';
 import {existsSync, readdirSync, statSync} from 'fs';
-import {Plugin, ShcPlugin} from './types';
+import {Plugin, ResolvedConfig, ShcPlugin} from './types';
 import base from './extensions/base';
+import {createModuleFromVariableGroups} from './variableGroups';
 
+// TODO: Handle clashes by throwing error!
 const pluginMap: Record<string, Plugin> | undefined = {};
 
 const validateModuleJson = (moduleJson: string) => {
@@ -279,6 +281,10 @@ export const loadPlugins = async (force?: boolean) => {
   }
 
   return pluginMap;
+};
+
+export const loadVariableGroups = (groups: ResolvedConfig['variableGroups']) => {
+  createModuleFromVariableGroups(groups);
 };
 
 export const getPlugin = (name: string) => {

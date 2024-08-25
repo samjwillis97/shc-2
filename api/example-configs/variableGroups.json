@@ -1,12 +1,17 @@
 {
   "variableGroups": {
     "user": {
-      "name": "test user",
-      "email": "test@tester.com"
-    },
-    "secondUser": {
-      "name": "Second user",
-      "email": "second@tester.com"
+      "default": "main",
+      "values": {
+        "main": {
+          "name": "test user",
+          "email": "test@tester.com"
+        },
+        "second": {
+          "name": "Second user",
+          "email": "second@tester.com"
+        }
+      }
     }
   }
 }

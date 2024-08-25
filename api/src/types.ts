@@ -44,6 +44,12 @@ export const EndpointConfigSchema = z.object({
 
 export type EndpointConfig = z.infer<typeof EndpointConfigSchema>;
 
+// Add custom validation to make sure default is one of the keys of values
+export const VariableGroupSchema = z.object({
+  default: z.string(),
+  values: z.record(z.string(), z.record(z.string(), z.string())),
+});
+
 export const ConfigImportSchema = z.object({
   imports: z.array(z.string()).optional(),
   plugins: z.array(z.string()).optional(),
@@ -56,6 +62,7 @@ export const ConfigImportSchema = z.object({
     .optional(),
   endpoints: z.record(z.string(), EndpointConfigSchema).optional(),
   variables: z.record(z.string(), z.string()).optional(),
+  variableGroups: z.record(z.string(), VariableGroupSchema).optional(),
 });
 
 export type ConfigImport = z.infer<typeof ConfigImportSchema>;

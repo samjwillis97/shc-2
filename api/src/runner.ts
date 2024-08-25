@@ -11,6 +11,9 @@ const executeHooks = (ctx: RunnerContext, hooks: string[]) => {
   }
 };
 
+// TODO: Add extra things to context
+//   and maybe make context in a level above, or a function to create it...
+//   want ResolvedConfig on it
 export const run = async (params: RunnerParams) => {
   const ctx: RunnerContext = {
     url: params.endpoint,

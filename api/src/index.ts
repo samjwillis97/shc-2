@@ -1,5 +1,5 @@
 import {readFileSync} from 'fs';
-import {cleanPluginDir, installPlugin, loadPlugins} from './plugins';
+import {cleanPluginDir, installPlugin, loadPlugins, loadVariableGroups} from './plugins';
 import {cwd} from 'process';
 import path from 'path';
 import {ConfigImport, WorkspaceConfig, WorkspaceConfigSchema} from './types';
@@ -28,6 +28,8 @@ const run = async () => {
     }
     await loadPlugins();
   }
+
+  loadVariableGroups(workspaceConfig.variableGroups);
 
   const selectedEndpoint = workspaceConfig.endpoints?.getSomething;
 
