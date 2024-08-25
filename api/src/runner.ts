@@ -13,7 +13,10 @@ const executeHooks = (ctx: RunnerContext, hooks: string[]) => {
 
 export const run = async (params: RunnerParams) => {
   const ctx: RunnerContext = {
-    req: new Request(params.endpoint),
+    url: params.endpoint,
+    req: {
+      method: params.method,
+    },
   };
 
   const {hooks} = params;
@@ -22,7 +25,7 @@ export const run = async (params: RunnerParams) => {
   }
 
   try {
-    const response = await fetch(ctx.req);
+    const response = await fetch(new Request(ctx.url, ctx.req));
     ctx.res = response;
     if (hooks) {
       executeHooks(ctx, hooks['post-request']);
