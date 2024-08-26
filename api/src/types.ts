@@ -108,5 +108,6 @@ export interface ShcPlugin {
 export type RunnerContext = {
   url: string;
   req: RequestInit;
+  hooks: RunnerParams['hooks'];
   res?: Response;
 };

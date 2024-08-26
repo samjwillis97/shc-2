@@ -2,18 +2,20 @@
   "name": "example-workspace-config",
   "imports": ["./variables.json", "./variableGroups.json"],
   "plugins": ["shc-plugin-example"],
+  "variables": {
+    "url": "{{environment.api-gw-url}}"
+  },
   "hooks": {
     "pre-request": ["example.auth", "base.logContext"],
     "post-request": ["base.logContext"]
   },
   "headers": {
-    "Content-Type": "application/json",
-    "first-header": "hard-coded"
+    "Content-Type": "application/json"
   },
   "endpoints": {
     "getSomething": {
       "method": "GET",
-      "endpoint": "{{baseUrl}}/get",
+      "endpoint": "{{url}}/get",
       "headers": {
         "endpoint-header": "should-be-there",
         "user": "{{user.email}}"

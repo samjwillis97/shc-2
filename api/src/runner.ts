@@ -1,5 +1,7 @@
+import {mergeConfigsToRunnerParams} from './config';
 import {getPlugin} from './plugins';
-import {RunnerContext, RunnerParams} from './types';
+import {resolveTemplates} from './templates';
+import {ConfigImport, EndpointConfig, RunnerContext, WorkspaceConfig} from './types';
 
 const executeHooks = (ctx: RunnerContext, hooks: string[]) => {
   for (const hook of hooks) {
@@ -11,28 +13,33 @@ const executeHooks = (ctx: RunnerContext, hooks: string[]) => {
   }
 };
 
-// TODO: Add extra things to context
-//   and maybe make context in a level above, or a function to create it...
-//   want ResolvedConfig on it
-export const run = async (params: RunnerParams) => {
-  const ctx: RunnerContext = {
+export const createRunnerContext = (
+  config: WorkspaceConfig | ConfigImport,
+  endpoint: EndpointConfig,
+): RunnerContext => {
+  const resolvedConfig = resolveTemplates(config);
+  const resolvedEndpoint = resolveTemplates(endpoint);
+  const params = mergeConfigsToRunnerParams(resolvedConfig, resolvedEndpoint);
+  return {
+    hooks: params.hooks,
     url: params.endpoint,
     req: {
       method: params.method,
       headers: params.headers,
     },
   };
+};
 
-  const {hooks} = params;
-  if (hooks) {
-    executeHooks(ctx, hooks['pre-request']);
+export const run = async (ctx: RunnerContext) => {
+  if (ctx.hooks) {
+    executeHooks(ctx, ctx.hooks['pre-request']);
   }
 
   try {
     const response = await fetch(new Request(ctx.url, ctx.req));
     ctx.res = response;
-    if (hooks) {
-      executeHooks(ctx, hooks['post-request']);
+    if (ctx.hooks) {
+      executeHooks(ctx, ctx.hooks['post-request']);
     }
     console.log(await response.json());
   } catch (err) {

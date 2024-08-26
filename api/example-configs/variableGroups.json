@@ -1,5 +1,13 @@
 {
   "variableGroups": {
+    "environment": {
+      "default": "local",
+      "values": {
+        "local": {
+          "api-gw-url": "http://localhost:3000"
+        }
+      }
+    },
     "user": {
       "default": "main",
       "values": {
