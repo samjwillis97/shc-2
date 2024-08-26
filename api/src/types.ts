@@ -83,6 +83,13 @@ export type WorkspaceConfig = z.infer<typeof WorkspaceConfigSchema>;
 
 export type ResolvedConfig = WorkspaceConfig | ConfigImport;
 
+export const ModuleJsonSchema = z.object({
+  shc: z.object({
+    id: z.string(),
+  }),
+  name: z.string(),
+});
+
 export interface Module {
   'pre-request-hooks': {
     [key: string]: (ctx: RunnerContext, config: unknown) => void;

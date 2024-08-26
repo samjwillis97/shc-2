@@ -53,7 +53,6 @@ export const getConfig = (configJson: string = '{}', force?: boolean) => {
   return config;
 };
 
-// TODO: Type for config post import
 export const resolveImports = (configPath: string, config: WorkspaceConfig | ConfigImport): ResolvedConfig => {
   const configDirectory = configPath.substring(0, configPath.lastIndexOf(path.sep));
   if (!config.imports) return config;

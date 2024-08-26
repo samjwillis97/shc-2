@@ -4,35 +4,37 @@ import path from 'path';
 import childProcess from 'child_process';
 import {getConfig, getYarnPath} from './config';
 import {existsSync, readdirSync, statSync} from 'fs';
-import {Plugin, ResolvedConfig, ShcPlugin, WorkspaceConfig} from './types';
+import {ModuleJsonSchema, Plugin, ResolvedConfig, ShcPlugin, WorkspaceConfig} from './types';
 import base from './extensions/base';
 import {createModulesFromVariableGroups} from './variableGroups';
+import {z} from 'zod';
 
-// TODO: I think i need some plugin config of some description
-// like arguments to pass to the plugin when it is loaded or when it is calling functions
-// or atleast where it should be looking
-// the plugin should also be able to provide a validtor for this config so that I can error on that
-// plugin config will allow for things to be resolved and use variables etc.
-
-// TODO: Handle clashes by throwing error!
 const pluginMap: Record<string, Plugin> | undefined = {};
 
 const validateModuleJson = (moduleJson: string) => {
   try {
-    // TODO: zodify
-    const data = JSON.parse(moduleJson);
+    const schema = z.object({
+      shc: z.object({
+        id: z.string(),
+      }),
+      name: z.string(),
+      version: z.string(),
+      dist: z.unknown(),
+    });
 
-    if (!data || !data.shc) {
+    const parsed = schema.safeParse(JSON.parse(moduleJson));
+
+    if (parsed.success === false) {
       throw new Error('Failed to parse module info');
     }
 
-    console.log(`[plugins] Detected SHC plugin ${data.name}`);
+    console.log(`[plugins] Detected SHC plugin ${parsed.data.name}`);
 
     return {
-      shc: data.shc,
-      name: data.name,
-      version: data.version,
-      dist: data.dist,
+      shc: parsed.data.shc,
+      name: parsed.data.name,
+      version: parsed.data.version,
+      dist: parsed.data.dist,
     };
   } catch (err) {
     throw new Error(`Failed to parse module info`);
@@ -204,21 +206,26 @@ const resolvePlugins = async (paths: string[], pluginConfigs: WorkspaceConfig['p
 
         // eslint-disable-next-line @typescript-eslint/no-var-requires
         const pluginJson = require(packageJsonPath);
+        const parsedPluginJson = ModuleJsonSchema.safeParse(pluginJson);
 
-        if (!pluginJson.shc) continue;
+        if (parsedPluginJson.success === false) {
+          throw new Error(`Bad plugin detected: ${modulePath}`);
+        }
 
         // eslint-disable-next-line @typescript-eslint/no-var-requires
         const module = require(modulePath);
 
         // TODO: Validate module
 
-        pluginMap[pluginJson.shc.id] = {
+        if (Object.hasOwn(pluginMap, parsedPluginJson.data.shc.id))
+          throw new Error(`Plugin has already been loaded called: ${parsedPluginJson.data.shc.id}`);
+        pluginMap[parsedPluginJson.data.shc.id] = {
           module,
           directory: modulePath,
-          config: pluginConfigs ? pluginConfigs[pluginJson.shc.id] : undefined,
+          config: pluginConfigs ? pluginConfigs[parsedPluginJson.data.shc.id] : undefined,
         };
 
-        console.log(`[plugins] Loaded ${pluginJson.name} from ${modulePath}`);
+        console.log(`[plugins] Loaded ${parsedPluginJson.data.name} from ${modulePath}`);
       } catch (err) {
         console.log(err);
         throw Error(`Failed to load plugin: ${filename}`);
@@ -272,6 +279,7 @@ export const installPlugin = async (plugin: string) => {
 };
 
 const importExtensions = (pluginConfigs: WorkspaceConfig['pluginConfig']) => {
+  if (Object.hasOwn(pluginMap, 'base')) throw new Error(`Plugin has already been loaded called: base`);
   pluginMap['base'] = {
     directory: '.',
     module: base,
@@ -295,6 +303,7 @@ export const loadVariableGroups = (groups: ResolvedConfig['variableGroups']) => 
   if (!groups) return;
   const modules = createModulesFromVariableGroups(groups);
   for (const name of Object.keys(modules)) {
+    if (Object.hasOwn(pluginMap, name)) throw new Error(`Plugin has already been loaded called: ${name}`);
     pluginMap[name] = modules[name];
   }
 };
