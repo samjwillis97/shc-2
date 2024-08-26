@@ -1,11 +1,10 @@
 import {resolveTemplateInString} from './templates';
-import {ResolvedConfig} from './types';
 
 let variables: Record<string, string> = {};
 
-export const extractVariables = (config: ResolvedConfig) => {
-  if (config.variables) {
-    variables = config.variables;
+export const extractVariables = (configVariables?: Record<string, string>) => {
+  if (configVariables) {
+    variables = configVariables;
   }
 
   return variables;

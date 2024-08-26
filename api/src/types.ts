@@ -44,6 +44,7 @@ export const EndpointConfigSchema = z.object({
     })
     .optional(),
   endpoint: z.string(),
+  variables: z.record(z.string(), z.string()).optional(),
 });
 
 export type EndpointConfig = z.infer<typeof EndpointConfigSchema>;

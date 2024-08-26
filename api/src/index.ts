@@ -3,7 +3,7 @@ import {cleanPluginDir, installPlugin, loadPlugins, loadVariableGroups} from './
 import {cwd} from 'process';
 import path from 'path';
 import {ConfigImport, WorkspaceConfig, WorkspaceConfigSchema} from './types';
-import {resolveImports} from './config';
+import {mergeWorkspaceAndEndpointConfig, resolveImports} from './config';
 import {extractVariables} from './variables';
 import {createRunnerContext, run as execute} from './runner';
 
@@ -17,7 +17,12 @@ const run = async () => {
 
   let workspaceConfig: ConfigImport | WorkspaceConfig = workspaceConfigParsed.data;
   workspaceConfig = resolveImports(configPath, workspaceConfig);
-  extractVariables(workspaceConfig);
+  const selectedEndpoint = workspaceConfig.endpoints?.getSomething;
+  if (!selectedEndpoint) {
+    throw new Error('Missing endpoint');
+  }
+  const mergedConfig = mergeWorkspaceAndEndpointConfig(workspaceConfig, selectedEndpoint);
+  extractVariables(mergedConfig.variables);
 
   // TODO: Maybe automate some of the plugin stuff when parsing the config?
   await cleanPluginDir();
@@ -30,13 +35,7 @@ const run = async () => {
 
   loadVariableGroups(workspaceConfig.variableGroups);
 
-  const selectedEndpoint = workspaceConfig.endpoints?.getSomething;
-
-  if (!selectedEndpoint) {
-    throw new Error('Missing endpoint');
-  }
-
-  const runnerContext = createRunnerContext(workspaceConfig, selectedEndpoint);
+  const runnerContext = createRunnerContext(mergedConfig);
   execute(runnerContext);
 
   // myPlugin.default();

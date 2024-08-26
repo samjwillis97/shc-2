@@ -8,6 +8,7 @@ import {ModuleJsonSchema, Plugin, ResolvedConfig, ShcPlugin, WorkspaceConfig} fr
 import base from './extensions/base';
 import {createModulesFromVariableGroups} from './variableGroups';
 import {z} from 'zod';
+import {resolveTemplates} from './templates';
 
 const pluginMap: Record<string, Plugin> | undefined = {};
 
@@ -222,7 +223,7 @@ const resolvePlugins = async (paths: string[], pluginConfigs: WorkspaceConfig['p
         pluginMap[parsedPluginJson.data.shc.id] = {
           module,
           directory: modulePath,
-          config: pluginConfigs ? pluginConfigs[parsedPluginJson.data.shc.id] : undefined,
+          config: pluginConfigs ? Object.assign({}, pluginConfigs[parsedPluginJson.data.shc.id]) : undefined,
         };
 
         console.log(`[plugins] Loaded ${parsedPluginJson.data.name} from ${modulePath}`);
@@ -283,7 +284,7 @@ const importExtensions = (pluginConfigs: WorkspaceConfig['pluginConfig']) => {
   pluginMap['base'] = {
     directory: '.',
     module: base,
-    config: pluginConfigs ? pluginConfigs['base'] : undefined,
+    config: pluginConfigs ? Object.assign({}, pluginConfigs['base']) : undefined,
   };
 };
 
@@ -310,7 +311,11 @@ export const loadVariableGroups = (groups: ResolvedConfig['variableGroups']) => 
 
 export const getPlugin = (name: string) => {
   if (!pluginMap[name]) throw new Error(`Unable to get plugin: ${name}`);
-  return pluginMap[name];
+  const toReturn = pluginMap[name];
+  if (toReturn.config) {
+    toReturn.config = resolveTemplates(toReturn.config);
+  }
+  return toReturn;
 };
 
 export const cleanPluginDir = async () => {

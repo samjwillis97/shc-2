@@ -1,4 +1,4 @@
-import {mergeConfigsToRunnerParams} from './config';
+import {mergedConfigToRunnerParams} from './config';
 import {getPlugin} from './plugins';
 import {resolveTemplates} from './templates';
 import {ConfigImport, EndpointConfig, RunnerContext, WorkspaceConfig} from './types';
@@ -13,13 +13,9 @@ const executeHooks = (ctx: RunnerContext, hooks: string[]) => {
   }
 };
 
-export const createRunnerContext = (
-  config: WorkspaceConfig | ConfigImport,
-  endpoint: EndpointConfig,
-): RunnerContext => {
+export const createRunnerContext = (config: (WorkspaceConfig | ConfigImport) & EndpointConfig): RunnerContext => {
   const resolvedConfig = resolveTemplates(config);
-  const resolvedEndpoint = resolveTemplates(endpoint);
-  const params = mergeConfigsToRunnerParams(resolvedConfig, resolvedEndpoint);
+  const params = mergedConfigToRunnerParams(resolvedConfig);
   return {
     hooks: params.hooks,
     url: params.endpoint,

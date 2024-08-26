@@ -77,17 +77,27 @@ export const resolveImports = (configPath: string, config: WorkspaceConfig | Con
   return config;
 };
 
-export const mergeConfigsToRunnerParams = (
+export const mergeWorkspaceAndEndpointConfig = (
   workspace: WorkspaceConfig | ConfigImport,
   endpoint: EndpointConfig,
-): RunnerParams => {
+) => {
+  const merged = merge(workspace, endpoint);
+  merged.headers = {...(workspace.headers ?? {}), ...(endpoint.headers ?? {})};
+  merged.hooks = {
+    'pre-request': [...(workspace.hooks?.['pre-request'] ?? []), ...(endpoint.hooks?.['pre-request'] ?? [])],
+    'post-request': [...(workspace.hooks?.['post-request'] ?? []), ...(endpoint.hooks?.['post-request'] ?? [])],
+  };
+  return merged;
+};
+
+export const mergedConfigToRunnerParams = (config: (WorkspaceConfig | ConfigImport) & EndpointConfig): RunnerParams => {
   return {
-    method: endpoint.method,
-    endpoint: endpoint.endpoint,
-    headers: {...(workspace.headers ?? {}), ...(endpoint.headers ?? {})},
+    method: config.method,
+    endpoint: config.endpoint,
+    headers: config.headers ?? {},
     hooks: {
-      'pre-request': [...(workspace.hooks?.['pre-request'] ?? []), ...(endpoint.hooks?.['pre-request'] ?? [])],
-      'post-request': [...(workspace.hooks?.['post-request'] ?? []), ...(endpoint.hooks?.['post-request'] ?? [])],
+      'pre-request': config.hooks?.['pre-request'] ?? [],
+      'post-request': config.hooks?.['post-request'] ?? [],
     },
   };
 };

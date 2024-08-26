@@ -4,11 +4,13 @@
   "plugins": ["shc-plugin-example"],
   "pluginConfig": {
     "base": {
-      "test-config-value": "Hello, World! - {{environment.api-gw-url}}"
+      "test-config-value": "Hello, World! - {{environment.api-gw-url}}",
+      "date": "{{date}}"
     }
   },
   "variables": {
-    "url": "{{environment.api-gw-url}}"
+    "url": "{{environment.api-gw-url}}",
+    "date": "26/08/2024"
   },
   "hooks": {
     "pre-request": ["example.auth", "base.logContext", "base.logConfig"],
@@ -24,7 +26,14 @@
       "headers": {
         "endpoint-header": "should-be-there",
         "user": "{{user.email}}"
+      },
+      "variables": {
+        "date": "27/08/2024"
       }
+    },
+    "endpointTheSecond": {
+      "method": "GET",
+      "endpoint": "{{url}}/get"
     }
   }
 }
