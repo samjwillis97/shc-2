@@ -1,10 +1,13 @@
 {
   "variableGroups": {
     "environment": {
-      "default": "local",
+      "default": "test",
       "values": {
         "local": {
-          "api-gw-url": "http://localhost:3000"
+          "url": "http://localhost:3000"
+        },
+        "test": {
+          "url": "https://httpbin.org"
         }
       }
     },

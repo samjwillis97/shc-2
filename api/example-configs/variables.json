@@ -3,7 +3,7 @@
   "plugins": ["shc-plugin-example"],
   "pluginConfig": {
     "example": {
-      "baseUrl": "{{environment.api-gw-url}}"
+      "baseUrl": "{{environment.url}}"
     }
   },
   "variables": {

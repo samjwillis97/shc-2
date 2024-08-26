@@ -3,18 +3,6 @@ import {z} from 'zod';
 
 const appName = 'shc-2';
 
-export interface RunnerParams {
-  headers: {
-    [key: string]: string;
-  };
-  hooks?: {
-    'pre-request': string[];
-    'post-request': string[];
-  };
-  endpoint: string;
-  method: 'GET';
-}
-
 export const ShcApiConfigSchema = z.object({
   pluginDirectory: z
     .string()
@@ -35,7 +23,7 @@ export const ShcApiConfigSchema = z.object({
 // in plugin config and overwrite the existing value for that variable
 // i.e. configure what a get date plugin returns
 export const EndpointConfigSchema = z.object({
-  method: z.enum(['GET']),
+  method: z.enum(['GET', 'POST', 'PUT', 'PATCH', 'DELETE']),
   headers: z.record(z.string(), z.string()).optional(),
   hooks: z
     .object({
@@ -45,9 +33,22 @@ export const EndpointConfigSchema = z.object({
     .optional(),
   endpoint: z.string(),
   variables: z.record(z.string(), z.string()).optional(),
+  body: z.unknown().optional(),
 });
 
 export type EndpointConfig = z.infer<typeof EndpointConfigSchema>;
+
+export interface RunnerParams {
+  headers: {
+    [key: string]: string;
+  };
+  hooks?: {
+    'pre-request': string[];
+    'post-request': string[];
+  };
+  endpoint: string;
+  method: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
+}
 
 // Add custom validation to make sure default is one of the keys of values
 export const VariableGroupSchema = z.object({
