@@ -2,11 +2,16 @@
   "name": "example-workspace-config",
   "imports": ["./variables.json", "./variableGroups.json"],
   "plugins": ["shc-plugin-example"],
+  "pluginConfig": {
+    "base": {
+      "test-config-value": "Hello, World! - {{environment.api-gw-url}}"
+    }
+  },
   "variables": {
     "url": "{{environment.api-gw-url}}"
   },
   "hooks": {
-    "pre-request": ["example.auth", "base.logContext"],
+    "pre-request": ["example.auth", "base.logContext", "base.logConfig"],
     "post-request": ["base.logContext"]
   },
   "headers": {

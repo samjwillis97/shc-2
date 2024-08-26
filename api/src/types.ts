@@ -55,6 +55,7 @@ export type VariableGroup = z.infer<typeof VariableGroupSchema>;
 export const ConfigImportSchema = z.object({
   imports: z.array(z.string()).optional(),
   plugins: z.array(z.string()).optional(),
+  pluginConfig: z.record(z.string(), z.unknown()).optional(),
   headers: z.record(z.string(), z.string()).optional(),
   hooks: z
     .object({
@@ -80,19 +81,20 @@ export type ResolvedConfig = WorkspaceConfig | ConfigImport;
 
 export interface Module {
   'pre-request-hooks': {
-    [key: string]: (ctx: RunnerContext) => void;
+    [key: string]: (ctx: RunnerContext, config: unknown) => void;
   };
   'post-request-hooks': {
-    [key: string]: (ctx: RunnerContext) => void;
+    [key: string]: (ctx: RunnerContext, config: unknown) => void;
   };
   'template-handlers': {
-    [key: string]: () => string;
+    [key: string]: (config: unknown) => string;
   };
 }
 
 export interface Plugin {
   directory: string;
   module: Module;
+  config?: unknown;
 }
 
 export interface ShcPlugin {

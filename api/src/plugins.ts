@@ -4,13 +4,15 @@ import path from 'path';
 import childProcess from 'child_process';
 import {getConfig, getYarnPath} from './config';
 import {existsSync, readdirSync, statSync} from 'fs';
-import {Plugin, ResolvedConfig, ShcPlugin} from './types';
+import {Plugin, ResolvedConfig, ShcPlugin, WorkspaceConfig} from './types';
 import base from './extensions/base';
 import {createModulesFromVariableGroups} from './variableGroups';
 
 // TODO: I think i need some plugin config of some description
 // like arguments to pass to the plugin when it is loaded or when it is calling functions
 // or atleast where it should be looking
+// the plugin should also be able to provide a validtor for this config so that I can error on that
+// plugin config will allow for things to be resolved and use variables etc.
 
 // TODO: Handle clashes by throwing error!
 const pluginMap: Record<string, Plugin> | undefined = {};
@@ -173,7 +175,7 @@ const installPluginToTmpDir = async (pluginLookupName: string) => {
  * When inserting in the pluginMap
  *
  */
-const resolvePlugins = async (paths: string[]) => {
+const resolvePlugins = async (paths: string[], pluginConfigs: WorkspaceConfig['pluginConfig']) => {
   for (const pluginPath of paths) {
     if (!existsSync(pluginPath)) {
       continue;
@@ -187,7 +189,7 @@ const resolvePlugins = async (paths: string[]) => {
         if (!statSync(modulePath).isDirectory()) continue;
 
         if (filename.startsWith('@')) {
-          await resolvePlugins([modulePath]);
+          await resolvePlugins([modulePath], pluginConfigs);
         }
 
         if (!readdirSync(modulePath).includes('package.json')) continue;
@@ -213,6 +215,7 @@ const resolvePlugins = async (paths: string[]) => {
         pluginMap[pluginJson.shc.id] = {
           module,
           directory: modulePath,
+          config: pluginConfigs ? pluginConfigs[pluginJson.shc.id] : undefined,
         };
 
         console.log(`[plugins] Loaded ${pluginJson.name} from ${modulePath}`);
@@ -268,20 +271,21 @@ export const installPlugin = async (plugin: string) => {
   }
 };
 
-const importExtensions = () => {
+const importExtensions = (pluginConfigs: WorkspaceConfig['pluginConfig']) => {
   pluginMap['base'] = {
     directory: '.',
     module: base,
+    config: pluginConfigs ? pluginConfigs['base'] : undefined,
   };
 };
 
 // TODO: I think this should have the option of only loading required plugins
 // TODO: Validate versions of plugins are correct if specified
-export const loadPlugins = async (force?: boolean) => {
+export const loadPlugins = async (pluginConfigs: WorkspaceConfig['pluginConfig'], force?: boolean) => {
   if (Object.keys(pluginMap).length === 0 || force) {
     const dirs = await findAllPluginDirs();
-    await resolvePlugins(dirs);
-    importExtensions();
+    await resolvePlugins(dirs, pluginConfigs);
+    importExtensions(pluginConfigs);
   }
 
   return pluginMap;

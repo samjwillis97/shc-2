@@ -25,7 +25,7 @@ const run = async () => {
     for (const plugin of workspaceConfig.plugins) {
       await installPlugin(plugin);
     }
-    await loadPlugins();
+    await loadPlugins(workspaceConfig.pluginConfig);
   }
 
   loadVariableGroups(workspaceConfig.variableGroups);

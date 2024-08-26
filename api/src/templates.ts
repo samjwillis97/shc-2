@@ -33,7 +33,7 @@ export const resolveTemplateInString = (str: string): string => {
       const method = plugin.module['template-handlers'][methodName];
       if (!method) throw new Error(`Failed to find method or something: ${methodName}`);
 
-      return method();
+      return method(plugin.config);
     }
 
     return getVariable(key) ?? '';
