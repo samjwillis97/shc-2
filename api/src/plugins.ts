@@ -8,6 +8,10 @@ import {Plugin, ResolvedConfig, ShcPlugin} from './types';
 import base from './extensions/base';
 import {createModulesFromVariableGroups} from './variableGroups';
 
+// TODO: I think i need some plugin config of some description
+// like arguments to pass to the plugin when it is loaded or when it is calling functions
+// or atleast where it should be looking
+
 // TODO: Handle clashes by throwing error!
 const pluginMap: Record<string, Plugin> | undefined = {};
 
