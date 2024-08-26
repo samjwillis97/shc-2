@@ -37,8 +37,6 @@ const run = async () => {
 
   const runnerContext = createRunnerContext(mergedConfig);
   execute(runnerContext);
-
-  // myPlugin.default();
 };
 
 run().then();
