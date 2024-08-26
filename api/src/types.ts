@@ -30,6 +30,10 @@ export const ShcApiConfigSchema = z.object({
     ),
 });
 
+// TODO: Add variables here that overwrite the default values
+// this would in theory let you set a variable here that is referenced
+// in plugin config and overwrite the existing value for that variable
+// i.e. configure what a get date plugin returns
 export const EndpointConfigSchema = z.object({
   method: z.enum(['GET']),
   headers: z.record(z.string(), z.string()).optional(),
