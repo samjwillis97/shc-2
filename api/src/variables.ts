@@ -12,9 +12,10 @@ export const extractVariables = (config: ResolvedConfig) => {
 };
 
 export const getVariable = (variable: string) => {
-  variable = variables[variable];
-  if (!variable) {
-    return '';
+  const value = variables[variable];
+  if (!value) {
+    throw new Error(`Unable to get variable: ${variable}`);
   }
-  return resolveTemplateInString(variable);
+
+  return resolveTemplateInString(value);
 };
