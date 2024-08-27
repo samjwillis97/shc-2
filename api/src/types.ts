@@ -92,10 +92,10 @@ export const ModuleJsonSchema = z.object({
 
 export interface Module {
   'pre-request-hooks': {
-    [key: string]: (ctx: RunnerContext, config: unknown) => void;
+    [key: string]: (ctx: RunnerContext, config: unknown) => Promise<void> | void;
   };
   'post-request-hooks': {
-    [key: string]: (ctx: RunnerContext, config: unknown) => void;
+    [key: string]: (ctx: RunnerContext, config: unknown) => Promise<void> | void;
   };
   'template-handlers': {
     [key: string]: (config: unknown) => string;

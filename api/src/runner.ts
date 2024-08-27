@@ -3,13 +3,13 @@ import {getPlugin} from './plugins';
 import {resolveTemplates} from './templates';
 import {ConfigImport, EndpointConfig, RunnerContext, WorkspaceConfig} from './types';
 
-const executeHooks = (ctx: RunnerContext, hooks: string[]) => {
+const executeHooks = async (ctx: RunnerContext, hooks: string[]) => {
   for (const hook of hooks) {
     const [pluginName, methodName] = hook.split('.');
     const plugin = getPlugin(pluginName);
     const method = plugin.module['pre-request-hooks'][methodName];
     if (!method) throw new Error(`Failed to find pre request hook or something: ${methodName}`);
-    method(ctx, plugin.config);
+    await method(ctx, plugin.config);
   }
 };
 
@@ -50,7 +50,7 @@ export const createRunnerContext = (config: (WorkspaceConfig | ConfigImport) & E
 
 export const run = async (ctx: RunnerContext) => {
   if (ctx.hooks) {
-    executeHooks(ctx, ctx.hooks['pre-request']);
+    await executeHooks(ctx, ctx.hooks['pre-request']);
   }
 
   let response: Response | undefined;
@@ -58,7 +58,7 @@ export const run = async (ctx: RunnerContext) => {
     response = await fetch(new Request(ctx.url, ctx.req));
     ctx.res = response;
     if (ctx.hooks) {
-      executeHooks(ctx, ctx.hooks['post-request']);
+      await executeHooks(ctx, ctx.hooks['post-request']);
     }
     console.log(await response.json());
   } catch (err) {
