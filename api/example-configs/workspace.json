@@ -19,7 +19,17 @@
   "headers": {
     "Content-Type": "application/json"
   },
+  "query-parameters": {
+    "test": "hello"
+  },
   "endpoints": {
+    "queryParamTest": {
+      "method": "GET",
+      "endpoint": "{{url}}/get",
+      "query-parameters": {
+        "another": "one"
+      }
+    },
     "variableOverrideTest": {
       "method": "GET",
       "endpoint": "{{url}}/get",

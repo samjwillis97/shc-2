@@ -87,6 +87,7 @@ export const mergeWorkspaceAndEndpointConfig = (
     'pre-request': [...(workspace.hooks?.['pre-request'] ?? []), ...(endpoint.hooks?.['pre-request'] ?? [])],
     'post-request': [...(workspace.hooks?.['post-request'] ?? []), ...(endpoint.hooks?.['post-request'] ?? [])],
   };
+  merged['query-parameters'] = {...(workspace['query-parameters'] ?? {}), ...(endpoint['query-parameters'] ?? {})};
   return merged;
 };
 

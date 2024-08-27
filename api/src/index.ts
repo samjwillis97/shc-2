@@ -17,7 +17,7 @@ const run = async () => {
 
   let workspaceConfig: ConfigImport | WorkspaceConfig = workspaceConfigParsed.data;
   workspaceConfig = resolveImports(configPath, workspaceConfig);
-  const selectedEndpoint = workspaceConfig.endpoints?.badMethodTest;
+  const selectedEndpoint = workspaceConfig.endpoints?.queryParamTest;
   if (!selectedEndpoint) {
     throw new Error('Missing endpoint');
   }

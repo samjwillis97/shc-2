@@ -35,11 +35,17 @@ export const createRunnerContext = (config: (WorkspaceConfig | ConfigImport) & E
     }
   }
 
-  return {
+  const context = {
     hooks: params.hooks,
     url: params.endpoint,
     req: request,
   };
+
+  if (resolvedConfig['query-parameters']) {
+    context.url = context.url + '?' + new URLSearchParams(resolvedConfig['query-parameters']).toString();
+  }
+
+  return context;
 };
 
 export const run = async (ctx: RunnerContext) => {

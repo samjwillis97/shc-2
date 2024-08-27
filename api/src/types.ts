@@ -29,6 +29,7 @@ export const EndpointConfigSchema = z.object({
     .optional(),
   endpoint: z.string(),
   variables: z.record(z.string(), z.string()).optional(),
+  'query-parameters': z.record(z.string(), z.string()).optional(),
   body: z.unknown().optional(),
 });
 
@@ -68,6 +69,7 @@ export const ConfigImportSchema = z.object({
   endpoints: z.record(z.string(), EndpointConfigSchema).optional(),
   variables: z.record(z.string(), z.string()).optional(),
   variableGroups: z.record(z.string(), VariableGroupSchema).optional(),
+  'query-parameters': z.record(z.string(), z.string()).optional(),
 });
 
 export type ConfigImport = z.infer<typeof ConfigImportSchema>;
