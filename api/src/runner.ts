@@ -41,8 +41,9 @@ export const createRunnerContext = (config: (WorkspaceConfig | ConfigImport) & E
     req: request,
   };
 
-  if (resolvedConfig['query-parameters']) {
-    context.url = context.url + '?' + new URLSearchParams(resolvedConfig['query-parameters']).toString();
+  const queryParamString = new URLSearchParams(resolvedConfig['query-parameters']).toString();
+  if (queryParamString) {
+    context.url = context.url + '?' + queryParamString;
   }
 
   return context;
