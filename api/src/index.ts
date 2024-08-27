@@ -8,7 +8,7 @@ import {extractVariables} from './variables';
 import {createRunnerContext, run as execute} from './runner';
 
 const run = async () => {
-  const configPath = path.join(cwd(), 'example-configs/workspace.json');
+  const configPath = path.join(cwd(), '../config/bff-workspace.json');
   const workspaceConfigFile = readFileSync(configPath, 'utf8');
   const workspaceConfigParsed = WorkspaceConfigSchema.safeParse(JSON.parse(workspaceConfigFile));
   if (workspaceConfigParsed.success === false) {
@@ -17,7 +17,7 @@ const run = async () => {
 
   let workspaceConfig: ConfigImport | WorkspaceConfig = workspaceConfigParsed.data;
   workspaceConfig = resolveImports(configPath, workspaceConfig);
-  const selectedEndpoint = workspaceConfig.endpoints?.queryParamTest;
+  const selectedEndpoint = workspaceConfig.endpoints?.getCapabilities;
   if (!selectedEndpoint) {
     throw new Error('Missing endpoint');
   }
@@ -36,7 +36,8 @@ const run = async () => {
   loadVariableGroups(workspaceConfig.variableGroups);
 
   const runnerContext = createRunnerContext(mergedConfig);
-  execute(runnerContext);
+  const response = await execute(runnerContext);
+  console.log(JSON.stringify(response, null, 2));
 };
 
 run().then();

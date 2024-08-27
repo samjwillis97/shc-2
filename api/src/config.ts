@@ -35,7 +35,7 @@ export const getYarnPath = () => {
 
 export const getConfig = (configJson: string = '{}', force?: boolean) => {
   if (force || !config) {
-    console.log('[config] Parsing config JSON');
+    // console.log('[config] Parsing config JSON');
     const parsedConfig = ShcApiConfigSchema.safeParse(JSON.parse(configJson));
     if (parsedConfig.success === false) {
       console.log('[config] Failed to parse config');

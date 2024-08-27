@@ -10,6 +10,10 @@ export const base: Module = {
       console.log('Pre-request Context:');
       return console.log(ctx);
     },
+    logUrl: (ctx: RunnerContext) => {
+      console.error(`${ctx.req.method}: ${ctx.url}`);
+      return;
+    },
   },
   'post-request-hooks': {
     logContext: (ctx: RunnerContext) => {

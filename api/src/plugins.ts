@@ -29,7 +29,7 @@ const validateModuleJson = (moduleJson: string) => {
       throw new Error('Failed to parse module info');
     }
 
-    console.log(`[plugins] Detected SHC plugin ${parsed.data.name}`);
+    // console.log(`[plugins] Detected SHC plugin ${parsed.data.name}`);
 
     return {
       shc: parsed.data.shc,
@@ -50,7 +50,7 @@ const isShcPlugin = async (pluginLookupName: string) => {
     return validateModuleJson(await readFile(jsonPath, 'utf8'));
   }
   return new Promise<ShcPlugin>((resolve, reject) => {
-    console.log('[plugins] Fetching module info from npm');
+    // console.log('[plugins] Fetching module info from npm');
 
     childProcess.execFile(
       process.execPath,
@@ -83,14 +83,14 @@ const isShcPlugin = async (pluginLookupName: string) => {
 
         try {
           const data = JSON.parse(stdout.toString()).data;
-          console.log(`[plugin data]`, data);
+          // console.log(`[plugin data]`, data);
 
           if (!data) {
             reject(new Error('Failed to parse module info'));
             return;
           }
 
-          console.log(`[plugins] Detected SHC plugin ${data.shc.id}`);
+          // console.log(`[plugins] Detected SHC plugin ${data.shc.id}`);
 
           resolve({
             shc: data.shc,
@@ -109,7 +109,7 @@ const isShcPlugin = async (pluginLookupName: string) => {
 
 const installPluginToTmpDir = async (pluginLookupName: string) => {
   return new Promise<{tmpDir: string}>(async (resolve, reject) => {
-    console.log(`[plugins] Installing ${pluginLookupName} to tmp`);
+    // console.log(`[plugins] Installing ${pluginLookupName} to tmp`);
 
     let pluginTmpPathName = pluginLookupName;
     if (!pluginLookupName.startsWith('@') && pluginLookupName.includes('@')) {
@@ -146,8 +146,9 @@ const installPluginToTmpDir = async (pluginLookupName: string) => {
           // ELECTRON_RUN_AS_NODE: "true",
         },
       },
-      (err, stdout, stderr) => {
-        console.log('[plugins] Install complete', {err, stdout, stderr});
+      // third param is stderr
+      (err, stdout) => {
+        // console.log('[plugins] Install complete', {err, stdout, stderr});
         // Check yarn/electron process exit code.
         // In certain environments electron can exit with error even if the command was performed successfully.
         // Checking for success message in output is a workaround for false errors.
@@ -156,7 +157,7 @@ const installPluginToTmpDir = async (pluginLookupName: string) => {
           return;
         }
 
-        // if (stderr && !containsOnlyDeprecationWarnings(stderr)) {
+        // if (stderr) {
         //   reject(new Error(`Yarn error ${stderr.toString()}`));
         //   return;
         // }
@@ -226,7 +227,7 @@ const resolvePlugins = async (paths: string[], pluginConfigs: WorkspaceConfig['p
           config: pluginConfigs ? Object.assign({}, pluginConfigs[parsedPluginJson.data.shc.id]) : undefined,
         };
 
-        console.log(`[plugins] Loaded ${parsedPluginJson.data.name} from ${modulePath}`);
+        // console.log(`[plugins] Loaded ${parsedPluginJson.data.name} from ${modulePath}`);
       } catch (err) {
         console.log(err);
         throw Error(`Failed to load plugin: ${filename}`);
@@ -245,7 +246,7 @@ const findAllPluginDirs = async () => {
 
 // FIXME: Only install if missing or version is different
 export const installPlugin = async (plugin: string) => {
-  console.log(`[plugins] Installing ${plugin}`);
+  // console.log(`[plugins] Installing ${plugin}`);
   const config = getConfig();
 
   const module = await isShcPlugin(plugin);
@@ -253,7 +254,7 @@ export const installPlugin = async (plugin: string) => {
   const {tmpDir} = await installPluginToTmpDir(plugin);
   const pluginDir = path.join(config.pluginDirectory, module.name);
 
-  console.log(`[plugins] Moving plugin from ${tmpDir} to ${pluginDir}`);
+  // console.log(`[plugins] Moving plugin from ${tmpDir} to ${pluginDir}`);
 
   try {
     await cp(path.join(tmpDir, module.name), pluginDir, {

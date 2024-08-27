@@ -61,12 +61,11 @@ export const run = async (ctx: RunnerContext) => {
     if (ctx.hooks) {
       await executeHooks(ctx, ctx.hooks['post-request']);
     }
-    console.log(await response.json());
+    return response.json();
   } catch (err) {
     if (response) {
-      console.log(`Request Failed - ${response.status}: ${response.statusText}`);
-      return;
+      throw new Error(`Request Failed - ${response.status}: ${response.statusText}`);
     }
-    console.error(err);
+    throw err;
   }
 };
