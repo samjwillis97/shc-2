@@ -12,7 +12,8 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
-    "commander": "^12.1.0"
+    "commander": "^12.1.0",
+    "shc-api": "file:../api"
   },
   "devDependencies": {
     "@types/node": "^22.5.1",

@@ -1,9 +1,16 @@
-import path from 'path';
+import path, {dirname} from 'path';
 import {z} from 'zod';
 
 const appName = 'shc-2';
 
+const getAppDir = () => {
+  const dir = require.main?.filename;
+  if (!dir) throw new Error('IDK something');
+  return dirname(dir);
+};
+
 export const ShcApiConfigSchema = z.object({
+  yarnPath: z.string().default(path.resolve(getAppDir(), '../bin/yarn-standalone.js')),
   pluginDirectory: z
     .string()
     .default(

@@ -1,27 +1,11 @@
-import path, {dirname} from 'path';
 import {z} from 'zod';
 import merge from 'deepmerge';
 import {ConfigImport, EndpointConfig, ShcApiConfigSchema, WorkspaceConfig, RunnerParams} from './types';
 
 let config: z.infer<typeof ShcApiConfigSchema> | undefined = undefined;
 
-// const getConfigDefaultPath = () => {
-//   if (!process.env.HOME) throw new Error('Unsupported system');
-//   return path.join(process.env.HOME, '.config', appName);
-// };
-
-const getAppDir = () => {
-  const dir = require.main?.filename;
-  if (!dir) throw new Error('IDK something');
-  return dirname(dir);
-};
-
-// NOTE: Should also think about making this configurable, then you could bring your own yarn instead
-// NOTE: Might need to change this path depending on dev/prod
-// dev/prod should be determined by app environment
-// app environment denoted by SHC_ENV env variable
 export const getYarnPath = () => {
-  return path.resolve(getAppDir(), '../bin/yarn-standalone.js');
+  return getConfig().yarnPath;
 };
 
 export const getConfig = (configJson: string = '{}', force?: boolean) => {

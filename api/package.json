@@ -24,7 +24,7 @@
     "build:cjs": "tsc -p ./configs/tsconfig.cjs.json",
     "build:types": "tsc -p ./configs/tsconfig.types.json",
     "build": "npm run clean && npm run build:cjs && npm run build:esm",
-    "start": "ts-node src/index.ts"
+    "start": "ts-node src/demo.ts"
   },
   "keywords": [],
   "author": "",
