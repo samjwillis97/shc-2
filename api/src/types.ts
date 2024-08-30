@@ -18,18 +18,31 @@ export const ShcApiConfigSchema = z.object({
     ),
 });
 
+const HooksSchema = z.object({
+  'pre-request': z.array(z.string()).optional(),
+  'post-request': z.array(z.string()).optional(),
+});
+type Hooks = z.infer<typeof HooksSchema>;
+
+const VariablesSchema = z.record(z.string(), z.string());
+const QueryParameterSchema = z.record(z.string(), z.string());
+const HeaderSchema = z.record(z.string(), z.string());
+
+// Add custom validation to make sure default is one of the keys of values
+const VariableGroupSchema = z.object({
+  default: z.string(),
+  values: z.record(z.string(), z.record(z.string(), z.string())),
+});
+
+const VariableGroupsSchema = z.record(z.string(), VariableGroupSchema);
+
 export const EndpointConfigSchema = z.object({
   method: z.enum(['GET', 'POST', 'PUT', 'PATCH', 'DELETE']),
-  headers: z.record(z.string(), z.string()).optional(),
-  hooks: z
-    .object({
-      'pre-request': z.array(z.string()).optional(),
-      'post-request': z.array(z.string()).optional(),
-    })
-    .optional(),
+  headers: HeaderSchema.optional(),
+  hooks: HooksSchema.optional(),
   endpoint: z.string(),
-  variables: z.record(z.string(), z.string()).optional(),
-  'query-parameters': z.record(z.string(), z.string()).optional(),
+  variables: VariablesSchema.optional(),
+  'query-parameters': QueryParameterSchema.optional(),
   body: z.unknown().optional(),
 });
 
@@ -39,19 +52,10 @@ export interface RunnerParams {
   headers: {
     [key: string]: string;
   };
-  hooks?: {
-    'pre-request': string[];
-    'post-request': string[];
-  };
+  hooks?: Hooks;
   endpoint: string;
   method: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
 }
-
-// Add custom validation to make sure default is one of the keys of values
-export const VariableGroupSchema = z.object({
-  default: z.string(),
-  values: z.record(z.string(), z.record(z.string(), z.string())),
-});
 
 export type VariableGroup = z.infer<typeof VariableGroupSchema>;
 
@@ -59,17 +63,12 @@ export const ConfigImportSchema = z.object({
   imports: z.array(z.string()).optional(),
   plugins: z.array(z.string()).optional(),
   pluginConfig: z.record(z.string(), z.unknown()).optional(),
-  headers: z.record(z.string(), z.string()).optional(),
-  hooks: z
-    .object({
-      'pre-request': z.array(z.string()).optional(),
-      'post-request': z.array(z.string()).optional(),
-    })
-    .optional(),
+  headers: HeaderSchema.optional(),
+  hooks: HooksSchema.optional(),
   endpoints: z.record(z.string(), EndpointConfigSchema).optional(),
-  variables: z.record(z.string(), z.string()).optional(),
-  variableGroups: z.record(z.string(), VariableGroupSchema).optional(),
-  'query-parameters': z.record(z.string(), z.string()).optional(),
+  variables: VariablesSchema.optional(),
+  variableGroups: VariableGroupsSchema.optional(),
+  'query-parameters': QueryParameterSchema.optional(),
 });
 
 export type ConfigImport = z.infer<typeof ConfigImportSchema>;
@@ -80,6 +79,13 @@ export const WorkspaceConfigSchema = ConfigImportSchema.and(
   }),
 );
 export type WorkspaceConfig = z.infer<typeof WorkspaceConfigSchema>;
+
+export const CollectionSchema = z.object({
+  imports: z.array(z.string()).optional(),
+  workspaces: z.array(z.string()),
+  variables: VariablesSchema.optional(),
+  variableGroups: VariableGroupsSchema.optional(),
+});
 
 export type ResolvedConfig = WorkspaceConfig | ConfigImport;
 

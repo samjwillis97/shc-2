@@ -3,7 +3,7 @@ import {getPlugin} from './plugins';
 import {resolveTemplates} from './templates';
 import {ConfigImport, EndpointConfig, RunnerContext, WorkspaceConfig} from './types';
 
-const executeHooks = async (ctx: RunnerContext, hooks: string[]) => {
+const executeHooks = async (ctx: RunnerContext, hooks: string[] = []) => {
   for (const hook of hooks) {
     const [pluginName, methodName] = hook.split('.');
     const plugin = getPlugin(pluginName);

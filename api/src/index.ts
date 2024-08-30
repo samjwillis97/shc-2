@@ -3,9 +3,10 @@ import {cleanPluginDir, installPlugin, loadPlugins, loadVariableGroups} from './
 import {cwd} from 'process';
 import path from 'path';
 import {ConfigImport, WorkspaceConfig, WorkspaceConfigSchema} from './types';
-import {mergeWorkspaceAndEndpointConfig, resolveImports} from './config';
+import {mergeWorkspaceAndEndpointConfig} from './config';
 import {extractVariables} from './variables';
 import {createRunnerContext, run as execute} from './runner';
+import {resolveImports} from './imports';
 
 const run = async () => {
   const configPath = path.join(cwd(), '../config/bff-workspace.json');
