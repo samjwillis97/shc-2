@@ -1,4 +1,4 @@
-import {readFileSync} from 'fs';
+import {existsSync, readdirSync, readFileSync, statSync} from 'fs';
 import {cleanPluginDir, installPlugin, loadPlugins, loadVariableGroups} from './plugins';
 import {cwd} from 'process';
 import path from 'path';
@@ -7,10 +7,23 @@ import {mergeWorkspaceAndEndpointConfig} from './config';
 import {extractVariables} from './variables';
 import {createRunnerContext, run as execute} from './runner';
 import {resolveImports} from './imports';
+import {getFileOps, setFileOps} from './files';
+
+const initNodeJsFileOpts = () => {
+  setFileOps({
+    exists: (p) => existsSync(p),
+    isDir: (p) => statSync(p).isDirectory(),
+    readFile: (p) => readFileSync(p, 'utf8'),
+    readDir: (p) => readdirSync(p),
+  });
+};
 
 const run = async () => {
-  const configPath = path.join(cwd(), '../config/bff-workspace.json');
-  const workspaceConfigFile = readFileSync(configPath, 'utf8');
+  initNodeJsFileOpts();
+  const fileOperators = getFileOps();
+
+  const configPath = path.join(cwd(), './example-configs/workspace.json');
+  const workspaceConfigFile = fileOperators.readFile(configPath);
   const workspaceConfigParsed = WorkspaceConfigSchema.safeParse(JSON.parse(workspaceConfigFile));
   if (workspaceConfigParsed.success === false) {
     throw new Error('Failed to read workspace config');
@@ -18,7 +31,7 @@ const run = async () => {
 
   let workspaceConfig: ConfigImport | WorkspaceConfig = workspaceConfigParsed.data;
   workspaceConfig = resolveImports(configPath, workspaceConfig);
-  const selectedEndpoint = workspaceConfig.endpoints?.getCapabilities;
+  const selectedEndpoint = workspaceConfig.endpoints?.queryParamTest;
   if (!selectedEndpoint) {
     throw new Error('Missing endpoint');
   }

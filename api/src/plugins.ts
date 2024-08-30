@@ -1,14 +1,14 @@
-import {cp, mkdir, readdir, readFile, rm, stat} from 'fs/promises';
+import {cp, mkdir, readFile, rm, stat} from 'fs/promises';
 import {tmpdir} from 'os';
 import path from 'path';
 import childProcess from 'child_process';
 import {getConfig, getYarnPath} from './config';
-import {existsSync, readdirSync, statSync} from 'fs';
 import {ModuleJsonSchema, Plugin, ResolvedConfig, ShcPlugin, WorkspaceConfig} from './types';
 import base from './extensions/base';
 import {createModulesFromVariableGroups} from './variableGroups';
 import {z} from 'zod';
 import {resolveTemplates} from './templates';
+import {getFileOps} from './files';
 
 const pluginMap: Record<string, Plugin> | undefined = {};
 
@@ -180,23 +180,25 @@ const installPluginToTmpDir = async (pluginLookupName: string) => {
  *
  */
 const resolvePlugins = async (paths: string[], pluginConfigs: WorkspaceConfig['pluginConfig']) => {
+  const fileOperators = getFileOps();
+
   for (const pluginPath of paths) {
-    if (!existsSync(pluginPath)) {
+    if (!fileOperators.exists(pluginPath)) {
       continue;
     }
 
-    for (const filename of readdirSync(pluginPath)) {
+    for (const filename of fileOperators.readDir(pluginPath)) {
       try {
         const modulePath = path.join(pluginPath, filename);
         const packageJsonPath = path.join(modulePath, 'package.json');
 
-        if (!statSync(modulePath).isDirectory()) continue;
+        if (!fileOperators.isDir(modulePath)) continue;
 
         if (filename.startsWith('@')) {
           await resolvePlugins([modulePath], pluginConfigs);
         }
 
-        if (!readdirSync(modulePath).includes('package.json')) continue;
+        if (!fileOperators.readDir(modulePath).includes('package.json')) continue;
 
         // FIXME:
         // Delete `require` cache if plugin has been required before
@@ -267,8 +269,9 @@ export const installPlugin = async (plugin: string) => {
   }
   // Move each dependency into node_modules folder
   const pluginModulesDir = path.join(pluginDir, 'node_modules');
+  const fileOperators = getFileOps();
   await mkdir(pluginModulesDir, {recursive: true});
-  for (const filename of await readdir(tmpDir)) {
+  for (const filename of fileOperators.readDir(tmpDir)) {
     const src = path.join(tmpDir, filename);
     const file = await stat(src);
     if (filename === plugin || !file.isDirectory()) {
@@ -321,7 +324,8 @@ export const getPlugin = (name: string) => {
 
 export const cleanPluginDir = async () => {
   const config = getConfig();
-  const contents = await readdir(config.pluginDirectory);
+  const fileOperators = getFileOps();
+  const contents = fileOperators.readDir(config.pluginDirectory);
 
   for (const item of contents) {
     const toDelete = path.join(config.pluginDirectory, item);
