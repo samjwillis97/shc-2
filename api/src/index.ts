@@ -1,4 +1,4 @@
-import {existsSync, readdirSync, readFileSync, statSync} from 'fs';
+import {cpSync, existsSync, mkdirSync, readdirSync, readFileSync, rmSync, statSync} from 'fs';
 import {cleanPluginDir, installPlugin, loadPlugins, loadVariableGroups} from './plugins';
 import {cwd} from 'process';
 import path from 'path';
@@ -11,10 +11,13 @@ import {getFileOps, setFileOps} from './files';
 
 const initNodeJsFileOpts = () => {
   setFileOps({
+    cp: (source, dest) => cpSync(source, dest, {recursive: true, verbatimSymlinks: true}),
+    rmrf: (p) => rmSync(p, {recursive: true, force: true}),
     exists: (p) => existsSync(p),
     isDir: (p) => statSync(p).isDirectory(),
-    readFile: (p) => readFileSync(p, 'utf8'),
+    mkDirRecursive: (p) => mkdirSync(p, {recursive: true}),
     readDir: (p) => readdirSync(p),
+    readFile: (p) => readFileSync(p, 'utf8'),
   });
 };
 

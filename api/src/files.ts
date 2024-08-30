@@ -1,12 +1,12 @@
 import {type PathOrFileDescriptor, type PathLike} from 'fs';
 
 export interface FileOps {
-  exists: (path: PathLike) => boolean;
-
-  readDir: (path: PathLike) => string[];
-
+  cp: (source: string, destination: string) => void;
+  rmrf: (path: PathLike) => void;
   isDir: (path: PathLike) => boolean;
-
+  exists: (path: PathLike) => boolean;
+  mkDirRecursive: (path: PathLike) => void;
+  readDir: (path: PathLike) => string[];
   readFile: (path: PathOrFileDescriptor) => string;
 }
 

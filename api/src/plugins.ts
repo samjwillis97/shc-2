@@ -1,4 +1,3 @@
-import {cp, mkdir, readFile, rm, stat} from 'fs/promises';
 import {tmpdir} from 'os';
 import path from 'path';
 import childProcess from 'child_process';
@@ -43,11 +42,12 @@ const validateModuleJson = (moduleJson: string) => {
 };
 
 const isShcPlugin = async (pluginLookupName: string) => {
+  const fileOperators = getFileOps();
   if (pluginLookupName.includes('@file:')) {
     // this is a file plugin, just return the local package json
     const pluginPath = pluginLookupName.split('@file:')[1];
     const jsonPath = path.join(pluginPath, 'package.json');
-    return validateModuleJson(await readFile(jsonPath, 'utf8'));
+    return validateModuleJson(fileOperators.readFile(jsonPath));
   }
   return new Promise<ShcPlugin>((resolve, reject) => {
     // console.log('[plugins] Fetching module info from npm');
@@ -108,6 +108,7 @@ const isShcPlugin = async (pluginLookupName: string) => {
 };
 
 const installPluginToTmpDir = async (pluginLookupName: string) => {
+  const fileOperators = getFileOps();
   return new Promise<{tmpDir: string}>(async (resolve, reject) => {
     // console.log(`[plugins] Installing ${pluginLookupName} to tmp`);
 
@@ -117,7 +118,7 @@ const installPluginToTmpDir = async (pluginLookupName: string) => {
     }
 
     const tmpDir = path.join(tmpdir(), escape(pluginTmpPathName));
-    await mkdir(tmpDir, {recursive: true});
+    fileOperators.mkDirRecursive(tmpDir);
     // TODO: Work out what each flag actually does
     // Looks to make a package json at tmpdir and install plugin beneath
     return childProcess.execFile(
@@ -242,7 +243,8 @@ const resolvePlugins = async (paths: string[], pluginConfigs: WorkspaceConfig['p
 
 const findAllPluginDirs = async () => {
   const config = getConfig();
-  await mkdir(config.pluginDirectory, {recursive: true});
+  const fileOperators = getFileOps();
+  fileOperators.mkDirRecursive(config.pluginDirectory);
   return [config.pluginDirectory];
 };
 
@@ -250,6 +252,7 @@ const findAllPluginDirs = async () => {
 export const installPlugin = async (plugin: string) => {
   // console.log(`[plugins] Installing ${plugin}`);
   const config = getConfig();
+  const fileOperators = getFileOps();
 
   const module = await isShcPlugin(plugin);
 
@@ -259,27 +262,22 @@ export const installPlugin = async (plugin: string) => {
   // console.log(`[plugins] Moving plugin from ${tmpDir} to ${pluginDir}`);
 
   try {
-    await cp(path.join(tmpDir, module.name), pluginDir, {
-      recursive: true,
-      verbatimSymlinks: true,
-    });
+    fileOperators.cp(path.join(tmpDir, module.name), pluginDir);
   } catch (err) {
     console.log(err);
     throw new Error(`Failed to move plugin, name in the package.json may be incorrect`);
   }
   // Move each dependency into node_modules folder
   const pluginModulesDir = path.join(pluginDir, 'node_modules');
-  const fileOperators = getFileOps();
-  await mkdir(pluginModulesDir, {recursive: true});
+  fileOperators.mkDirRecursive(pluginModulesDir);
   for (const filename of fileOperators.readDir(tmpDir)) {
     const src = path.join(tmpDir, filename);
-    const file = await stat(src);
-    if (filename === plugin || !file.isDirectory()) {
+    if (filename === plugin || !fileOperators.isDir(src)) {
       continue;
     }
 
     const dest = path.join(pluginModulesDir, filename);
-    await cp(src, dest, {recursive: true, verbatimSymlinks: true});
+    fileOperators.cp(src, dest);
   }
 };
 
@@ -329,11 +327,7 @@ export const cleanPluginDir = async () => {
 
   for (const item of contents) {
     const toDelete = path.join(config.pluginDirectory, item);
-    const info = await stat(toDelete);
-    if (!info.isDirectory()) continue;
-    await rm(toDelete, {
-      recursive: true,
-      force: true,
-    });
+    if (!fileOperators.isDir(toDelete)) continue;
+    fileOperators.rmrf(toDelete);
   }
 };
