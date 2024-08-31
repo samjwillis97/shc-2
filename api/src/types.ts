@@ -95,6 +95,8 @@ export const ShcApiConfigSchema = z.object({
     ),
 });
 
+export type ShcApiConfig = z.infer<typeof ShcApiConfigSchema>;
+
 export type ResolvedConfig = WorkspaceConfig | ConfigImport;
 
 export const ModuleJsonSchema = z.object({

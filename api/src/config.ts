@@ -1,6 +1,7 @@
 import {z} from 'zod';
 import merge from 'deepmerge';
 import {ConfigImport, EndpointConfig, ShcApiConfigSchema, WorkspaceConfig, RunnerParams} from './types';
+import {getFileOps} from './files';
 
 let config: z.infer<typeof ShcApiConfigSchema> | undefined = undefined;
 
@@ -28,6 +29,21 @@ export const getConfig = (configJson: string = '{}', force?: boolean) => {
   return config;
 };
 
+export const getKnownWorkspaces = () => {
+  const workspaceMap: Record<string, string> = {};
+  if (!config) throw new Error('Config missing');
+  const fileOperators = getFileOps();
+  for (const workspacePath of config.workspaces) {
+    const workspace = fileOperators.readFile(workspacePath);
+    const parsedWorkspace = z.object({name: z.string()}).safeParse(JSON.parse(workspace));
+    if (parsedWorkspace.success === false) throw new Error(`Workspace ${workspacePath} doesn't have a name`);
+    workspaceMap[parsedWorkspace.data.name] = workspacePath;
+  }
+
+  return workspaceMap;
+};
+
+// TODO: Also allow root level config to be merged in
 export const mergeWorkspaceAndEndpointConfig = (
   workspace: WorkspaceConfig | ConfigImport,
   endpoint: EndpointConfig,
