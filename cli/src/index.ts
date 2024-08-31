@@ -25,6 +25,7 @@ import {
 } from "shc-api";
 import { Command } from "commander";
 import { resolve, dirname } from "path";
+const omelette = require("omelette");
 
 const program = new Command();
 
@@ -43,7 +44,7 @@ const initNodeJsFileOpts = () => {
 
 const runHandler = async () => {
   const opts = program.opts();
-
+  initNodeJsFileOpts();
   const fileOperations = getFileOps();
   const workspaceConfigFile = fileOperations.readFile(opts.workspace);
   const workspaceConfigParsed = WorkspaceConfigSchema.parse(
@@ -92,8 +93,6 @@ const runHandler = async () => {
   console.log(JSON.stringify(response, null, 2));
 };
 
-initNodeJsFileOpts();
-
 program.name("shc").description("Sams HTTP client");
 
 program.option(
@@ -101,11 +100,23 @@ program.option(
   "specify collection json",
   "collection.json",
 );
+
 program.option(
   "-w, --workspace <file>",
   "specify workspace json",
   "workspace.json",
 );
+
+const completion = omelette("shc run <workspace> <endpoint>");
+// @ts-ignore
+completion.on("workspace", ({ reply }) => {
+  reply(["something", "else"]);
+});
+// @ts-ignore
+completion.on("endpoint", ({ reply }) => {
+  reply(["get", "post"]);
+});
+completion.init();
 
 program.command("run").action(runHandler);
 program.parse();

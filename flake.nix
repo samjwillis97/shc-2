@@ -22,7 +22,10 @@
 
         nativeBuildInputs = with pkgs; [ ];
 
-        buildInputs = with pkgs; [ nodejs_20 ];
+        buildInputs = with pkgs; [
+          nodejs_20
+          fish
+        ];
 
         packages = [ ];
       in
@@ -33,6 +36,7 @@
 
           shellHook = ''
             export PATH=$PATH:$PWD/api/node_modules/.bin
+            export PATH=$PATH:$PWD/cli/node_modules/.bin
           '';
         };
       }
