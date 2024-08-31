@@ -29,6 +29,7 @@ const run = async () => {
   const workspaceConfigFile = fileOperators.readFile(configPath);
   const workspaceConfigParsed = WorkspaceConfigSchema.safeParse(JSON.parse(workspaceConfigFile));
   if (workspaceConfigParsed.success === false) {
+    console.error(workspaceConfigParsed.error);
     throw new Error('Failed to read workspace config');
   }
 

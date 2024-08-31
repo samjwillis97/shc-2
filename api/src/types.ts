@@ -8,32 +8,20 @@ const getAppDir = () => {
   if (!dir) throw new Error('IDK something');
   return dirname(dir);
 };
-
-export const ShcApiConfigSchema = z.object({
-  yarnPath: z.string().default(path.resolve(getAppDir(), '../bin/yarn-standalone.js')),
-  pluginDirectory: z
-    .string()
-    .default(
-      path.join(
-        process.env.APPDATA ||
-          (process.platform == 'darwin'
-            ? process.env.HOME + '/Library/Preferences'
-            : process.env.HOME + '/.local/share'),
-        appName,
-        'plugins',
-      ),
-    ),
-});
-
-const HooksSchema = z.object({
-  'pre-request': z.array(z.string()).optional(),
-  'post-request': z.array(z.string()).optional(),
-});
+const HooksSchema = z
+  .object({
+    'pre-request': z.array(z.string()).default([]),
+    'post-request': z.array(z.string()).default([]),
+  })
+  .default({
+    'pre-request': [],
+    'post-request': [],
+  });
 type Hooks = z.infer<typeof HooksSchema>;
 
-const VariablesSchema = z.record(z.string(), z.string());
-const QueryParameterSchema = z.record(z.string(), z.string());
-const HeaderSchema = z.record(z.string(), z.string());
+const VariablesSchema = z.record(z.string(), z.string()).default({});
+const QueryParameterSchema = z.record(z.string(), z.string()).default({});
+const HeaderSchema = z.record(z.string(), z.string()).default({});
 
 // Add custom validation to make sure default is one of the keys of values
 const VariableGroupSchema = z.object({
@@ -41,15 +29,15 @@ const VariableGroupSchema = z.object({
   values: z.record(z.string(), z.record(z.string(), z.string())),
 });
 
-const VariableGroupsSchema = z.record(z.string(), VariableGroupSchema);
+const VariableGroupsSchema = z.record(z.string(), VariableGroupSchema).default({});
 
 export const EndpointConfigSchema = z.object({
   method: z.enum(['GET', 'POST', 'PUT', 'PATCH', 'DELETE']),
-  headers: HeaderSchema.optional(),
-  hooks: HooksSchema.optional(),
+  headers: HeaderSchema,
+  hooks: HooksSchema,
   endpoint: z.string(),
-  variables: VariablesSchema.optional(),
-  'query-parameters': QueryParameterSchema.optional(),
+  variables: VariablesSchema,
+  'query-parameters': QueryParameterSchema,
   body: z.unknown().optional(),
 });
 
@@ -67,15 +55,15 @@ export interface RunnerParams {
 export type VariableGroup = z.infer<typeof VariableGroupSchema>;
 
 export const ConfigImportSchema = z.object({
-  imports: z.array(z.string()).optional(),
-  plugins: z.array(z.string()).optional(),
-  pluginConfig: z.record(z.string(), z.unknown()).optional(),
-  headers: HeaderSchema.optional(),
-  hooks: HooksSchema.optional(),
-  endpoints: z.record(z.string(), EndpointConfigSchema).optional(),
-  variables: VariablesSchema.optional(),
-  variableGroups: VariableGroupsSchema.optional(),
-  'query-parameters': QueryParameterSchema.optional(),
+  imports: z.array(z.string()).default([]),
+  plugins: z.array(z.string()).default([]),
+  pluginConfig: z.record(z.string(), z.unknown()).default({}),
+  headers: HeaderSchema,
+  hooks: HooksSchema,
+  endpoints: z.record(z.string(), EndpointConfigSchema).default({}),
+  variables: VariablesSchema,
+  variableGroups: VariableGroupsSchema,
+  'query-parameters': QueryParameterSchema,
 });
 
 export type ConfigImport = z.infer<typeof ConfigImportSchema>;
@@ -87,11 +75,24 @@ export const WorkspaceConfigSchema = ConfigImportSchema.and(
 );
 export type WorkspaceConfig = z.infer<typeof WorkspaceConfigSchema>;
 
-export const CollectionSchema = z.object({
-  imports: z.array(z.string()).optional(),
-  workspaces: z.array(z.string()),
-  variables: VariablesSchema.optional(),
-  variableGroups: VariableGroupsSchema.optional(),
+export const ShcApiConfigSchema = z.object({
+  imports: z.array(z.string()).default([]),
+  workspaces: z.array(z.string()).default([]),
+  variables: VariablesSchema,
+  variableGroups: VariableGroupsSchema,
+  yarnPath: z.string().default(path.resolve(getAppDir(), '../bin/yarn-standalone.js')),
+  pluginDirectory: z
+    .string()
+    .default(
+      path.join(
+        process.env.APPDATA ||
+          (process.platform == 'darwin'
+            ? process.env.HOME + '/Library/Preferences'
+            : process.env.HOME + '/.local/share'),
+        appName,
+        'plugins',
+      ),
+    ),
 });
 
 export type ResolvedConfig = WorkspaceConfig | ConfigImport;

@@ -20,7 +20,8 @@ export const resolveImports = (configPath: string, config: WorkspaceConfig | Con
     if (importConfig.imports) {
       importConfig = resolveImports(importPath, importConfig);
     }
-    delete importConfig.imports;
+
+    importConfig.imports = [];
 
     config = merge(config, importConfig);
   }

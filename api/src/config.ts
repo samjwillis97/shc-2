@@ -33,12 +33,12 @@ export const mergeWorkspaceAndEndpointConfig = (
   endpoint: EndpointConfig,
 ) => {
   const merged = merge(workspace, endpoint);
-  merged.headers = {...(workspace.headers ?? {}), ...(endpoint.headers ?? {})};
+  merged.headers = {...workspace.headers, ...endpoint.headers};
   merged.hooks = {
-    'pre-request': [...(workspace.hooks?.['pre-request'] ?? []), ...(endpoint.hooks?.['pre-request'] ?? [])],
-    'post-request': [...(workspace.hooks?.['post-request'] ?? []), ...(endpoint.hooks?.['post-request'] ?? [])],
+    'pre-request': [...workspace.hooks['pre-request'], ...endpoint.hooks['pre-request']],
+    'post-request': [...workspace.hooks['post-request'], ...endpoint.hooks['post-request']],
   };
-  merged['query-parameters'] = {...(workspace['query-parameters'] ?? {}), ...(endpoint['query-parameters'] ?? {})};
+  merged['query-parameters'] = {...workspace['query-parameters'], ...endpoint['query-parameters']};
   return merged;
 };
 
@@ -46,10 +46,10 @@ export const mergedConfigToRunnerParams = (config: (WorkspaceConfig | ConfigImpo
   return {
     method: config.method,
     endpoint: config.endpoint,
-    headers: config.headers ?? {},
+    headers: config.headers,
     hooks: {
-      'pre-request': config.hooks?.['pre-request'] ?? [],
-      'post-request': config.hooks?.['post-request'] ?? [],
+      'pre-request': config.hooks['pre-request'],
+      'post-request': config.hooks['post-request'],
     },
   };
 };
