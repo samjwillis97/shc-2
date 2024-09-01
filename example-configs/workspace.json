@@ -1,0 +1,82 @@
+{
+  "name": "example-workspace-config",
+  "imports": ["./variables.json", "./variableGroups.json"],
+  "plugins": ["shc-plugin-example"],
+  "pluginConfig": {
+    "base": {
+      "test-config-value": "Hello, World! - {{environment.url}}",
+      "date": "{{date}}"
+    }
+  },
+  "variables": {
+    "url": "{{environment.url}}",
+    "date": "26/08/2024"
+  },
+  "hooks": {
+    "pre-request": ["example.auth", "base.logContext", "base.logConfig"],
+    "post-request": ["base.logContext"]
+  },
+  "headers": {
+    "Content-Type": "application/json"
+  },
+  "query-parameters": {
+    "test": "hello"
+  },
+  "endpoints": {
+    "queryParamTest": {
+      "method": "GET",
+      "endpoint": "{{url}}/get",
+      "query-parameters": {
+        "another": "one"
+      }
+    },
+    "variableOverrideTest": {
+      "method": "GET",
+      "endpoint": "{{url}}/get",
+      "variables": {
+        "date": "27/08/2024"
+      }
+    },
+    "headerTest": {
+      "method": "GET",
+      "endpoint": "{{url}}/get",
+      "headers": {
+        "endpoint-header": "should-be-there",
+        "user": "{{user.email}}"
+      }
+    },
+    "getTest": {
+      "method": "GET",
+      "endpoint": "{{url}}/get"
+    },
+    "postTest": {
+      "method": "POST",
+      "endpoint": "{{url}}/post",
+      "body": {
+        "this": {
+          "is": {
+            "purely": ["a", "test"]
+          }
+        }
+      }
+    },
+    "putTest": {
+      "method": "PUT",
+      "endpoint": "{{url}}/put",
+      "body": "new thing here"
+    },
+    "patchTest": {
+      "method": "PATCH",
+      "endpoint": "{{url}}/patch",
+      "body": ["minor-update"]
+    },
+    "deleteTest": {
+      "method": "DELETE",
+      "endpoint": "{{url}}/delete"
+    },
+    "badMethodTest": {
+      "method": "DELETE",
+      "endpoint": "{{url}}/get"
+    }
+  }
+}

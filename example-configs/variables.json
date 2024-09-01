@@ -1,0 +1,12 @@
+{
+  "imports": ["./nestedImport.json"],
+  "plugins": ["shc-plugin-example"],
+  "pluginConfig": {
+    "example": {
+      "baseUrl": "{{environment.url}}"
+    }
+  },
+  "variables": {
+    "my-second-url": "{{example.httpBinUrl}}"
+  }
+}

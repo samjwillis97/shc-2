@@ -76,10 +76,12 @@ export const WorkspaceConfigSchema = ConfigImportSchema.and(
 export type WorkspaceConfig = z.infer<typeof WorkspaceConfigSchema>;
 
 export const ShcApiConfigSchema = z.object({
+  path: z.string(),
   imports: z.array(z.string()).default([]),
   workspaces: z.array(z.string()).default([]),
   variables: VariablesSchema,
   variableGroups: VariableGroupsSchema,
+  // THIS NEEDS TO BE ABSOLUTE, or handle as relative :thonk:
   yarnPath: z.string().default(path.resolve(getAppDir(), '../bin/yarn-standalone.js')),
   pluginDirectory: z
     .string()

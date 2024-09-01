@@ -1,0 +1,28 @@
+{
+  "variableGroups": {
+    "environment": {
+      "default": "test",
+      "values": {
+        "local": {
+          "url": "http://localhost:3000"
+        },
+        "test": {
+          "url": "https://httpbin.org"
+        }
+      }
+    },
+    "user": {
+      "default": "main",
+      "values": {
+        "main": {
+          "name": "test user",
+          "email": "test@tester.com"
+        },
+        "second": {
+          "name": "Second user",
+          "email": "second@tester.com"
+        }
+      }
+    }
+  }
+}

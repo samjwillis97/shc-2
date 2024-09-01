@@ -1,0 +1,4 @@
+{
+  "workspaces": ["workspace.json"],
+  "yarnPath": "../api/bin/yarn-standalone.js"
+}

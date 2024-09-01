@@ -2,17 +2,25 @@ import {z} from 'zod';
 import merge from 'deepmerge';
 import {ConfigImport, EndpointConfig, ShcApiConfigSchema, WorkspaceConfig, RunnerParams} from './types';
 import {getFileOps} from './files';
+import path, {resolve} from 'path';
 
 let config: z.infer<typeof ShcApiConfigSchema> | undefined = undefined;
 
 export const getYarnPath = () => {
-  return getConfig().yarnPath;
+  const config = getConfig();
+  // FIXME: This will break on absolute paths
+  const configDir = config.path.substring(0, config.path.lastIndexOf(path.sep));
+  return resolve(configDir, config.yarnPath);
 };
 
-export const getConfig = (configJson: string = '{}', force?: boolean) => {
-  if (force || !config) {
+export const getConfig = (configPath?: string, force?: boolean) => {
+  if ((force || !config) && configPath) {
     // console.log('[config] Parsing config JSON');
-    const parsedConfig = ShcApiConfigSchema.safeParse(JSON.parse(configJson));
+    const fileOperators = getFileOps();
+    const configFile = fileOperators.readFile(configPath);
+    const configJson = JSON.parse(configFile);
+    configJson.path = configPath;
+    const parsedConfig = ShcApiConfigSchema.safeParse(configJson);
     if (parsedConfig.success === false) {
       console.log('[config] Failed to parse config');
       console.log(parsedConfig.error);
@@ -33,7 +41,10 @@ export const getKnownWorkspaces = () => {
   const workspaceMap: Record<string, string> = {};
   if (!config) throw new Error('Config missing');
   const fileOperators = getFileOps();
-  for (const workspacePath of config.workspaces) {
+  // FIXME: This will break, only handles relative paths
+  const configDir = config.path.substring(0, config.path.lastIndexOf(path.sep));
+  for (const workspaceRelPath of config.workspaces) {
+    const workspacePath = resolve(configDir, workspaceRelPath);
     const workspace = fileOperators.readFile(workspacePath);
     const parsedWorkspace = z.object({name: z.string()}).safeParse(JSON.parse(workspace));
     if (parsedWorkspace.success === false) throw new Error(`Workspace ${workspacePath} doesn't have a name`);

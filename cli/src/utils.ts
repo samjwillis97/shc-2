@@ -8,12 +8,17 @@ import {
   statSync,
 } from "fs";
 import { dirname } from "path";
-import { setFileOps } from "shc-api";
+import { FileOps, setFileOps } from "shc-api";
+
+export const defaultConfigFile = () =>
+  isDev() ? "../example-configs/config.json" : "$HOME/.config/shc/config.json";
+
+export const isDev = () => process.env["env"] === "DEV";
 
 export const getCwd = () => dirname(require.main?.filename ?? ".");
 
 export const initNodeJsFileOpts = () => {
-  setFileOps({
+  const fileOps: FileOps = {
     cp: (source, dest) =>
       cpSync(source, dest, { recursive: true, verbatimSymlinks: true }),
     rmrf: (p) => rmSync(p, { recursive: true, force: true }),
@@ -22,5 +27,7 @@ export const initNodeJsFileOpts = () => {
     mkDirRecursive: (p) => mkdirSync(p, { recursive: true }),
     readDir: (p) => readdirSync(p),
     readFile: (p) => readFileSync(p, "utf8"),
-  });
+  };
+  setFileOps(fileOps);
+  return fileOps;
 };

@@ -2,7 +2,6 @@ import {
   cleanPluginDir,
   createRunnerContext,
   extractVariables,
-  getFileOps,
   installPlugin,
   loadPlugins,
   loadVariableGroups,
@@ -11,28 +10,14 @@ import {
   run,
   WorkspaceConfigSchema,
   getConfig,
-  ShcApiConfig,
   getKnownWorkspaces,
 } from "shc-api";
-import { resolve } from "path";
-import { getCwd, initNodeJsFileOpts } from "../utils";
+import { defaultConfigFile, initNodeJsFileOpts } from "../utils";
 
 export const runHandler = async (workspace: string, endpoint: string) => {
-  initNodeJsFileOpts();
+  const fileOperations = initNodeJsFileOpts();
 
-  // TODO: Real config
-  // This will also set config
-  getConfig(
-    JSON.stringify({
-      workspaces: [
-        resolve(getCwd(), "../../api/example-configs/workspace.json"),
-      ],
-      yarnPath: resolve(
-        getCwd(),
-        "../node_modules/shc-api/bin/yarn-standalone.js",
-      ),
-    } as ShcApiConfig),
-  );
+  getConfig(defaultConfigFile());
 
   const workspaces = getKnownWorkspaces();
   if (!workspaces[workspace])
@@ -40,7 +25,6 @@ export const runHandler = async (workspace: string, endpoint: string) => {
 
   const workspacePath = workspaces[workspace];
 
-  const fileOperations = getFileOps();
   const workspaceConfigFile = fileOperations.readFile(workspacePath);
   const workspaceConfigParsed = WorkspaceConfigSchema.parse(
     JSON.parse(workspaceConfigFile),
