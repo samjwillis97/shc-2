@@ -7,7 +7,7 @@ import {
   rmSync,
   statSync,
 } from "fs";
-import { dirname } from "path";
+import { dirname, isAbsolute, join, resolve } from "path";
 import { FileOps, setFileOps } from "shc-api";
 
 export const defaultConfigFile = () =>
@@ -30,4 +30,20 @@ export const initNodeJsFileOpts = () => {
   };
   setFileOps(fileOps);
   return fileOps;
+};
+
+export const tryGetConfigFromCmd = (input: string) => {
+  let path = undefined;
+  if (input.includes(" -c ")) {
+    path = input.split(" -c ")[1];
+  }
+  if (input.includes(" --config ")) {
+    path = input.split(" -c ")[1];
+  }
+  if (!path) return path;
+
+  if (isAbsolute(path)) {
+    return path;
+  }
+  return resolve(process.env.PWD ?? "", path);
 };

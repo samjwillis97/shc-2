@@ -5,18 +5,24 @@ import {
   resolveImports,
   WorkspaceConfigSchema,
 } from "shc-api";
-import { defaultConfigFile, initNodeJsFileOpts } from "../utils";
+import {
+  defaultConfigFile,
+  initNodeJsFileOpts,
+  tryGetConfigFromCmd,
+} from "../utils";
 
 export const endpointCompletionHandler = ({
+  line,
   before,
   reply,
 }: {
+  line: string;
   before: string;
   reply: (arg: string[]) => void;
 }) => {
   initNodeJsFileOpts();
 
-  getConfig(defaultConfigFile());
+  getConfig(tryGetConfigFromCmd(line) ?? defaultConfigFile());
 
   const workspace = getKnownWorkspaces()[before];
 

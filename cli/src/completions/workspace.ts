@@ -1,12 +1,19 @@
 import { getConfig, getKnownWorkspaces } from "shc-api";
-import { defaultConfigFile, initNodeJsFileOpts } from "../utils";
+import {
+  defaultConfigFile,
+  initNodeJsFileOpts,
+  tryGetConfigFromCmd,
+} from "../utils";
 
 export const workspaceCompletionHandler = ({
+  line,
   reply,
 }: {
+  line: string;
   reply: (arg: string[]) => void;
 }) => {
   initNodeJsFileOpts();
-  getConfig(defaultConfigFile());
+  // MAYBE commander can do some of this parsing for me?
+  getConfig(tryGetConfigFromCmd(line) ?? defaultConfigFile());
   reply(Object.keys(getKnownWorkspaces()));
 };
