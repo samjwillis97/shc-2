@@ -1,9 +1,7 @@
 import {cpSync, existsSync, mkdirSync, readdirSync, readFileSync, rmSync, statSync} from 'fs';
 import {cleanPluginDir, installPlugin, loadPlugins, loadVariableGroups} from './plugins';
-import {cwd} from 'process';
-import path from 'path';
 import {ConfigImport, WorkspaceConfig, WorkspaceConfigSchema} from './types';
-import {mergeWorkspaceAndEndpointConfig} from './config';
+import {getConfig, getKnownWorkspaces, mergeWorkspaceAndEndpointConfig} from './config';
 import {extractVariables} from './variables';
 import {createRunnerContext, run as execute} from './runner';
 import {resolveImports} from './imports';
@@ -25,8 +23,10 @@ const run = async () => {
   initNodeJsFileOpts();
   const fileOperators = getFileOps();
 
-  const configPath = path.join(cwd(), './example-configs/workspace.json');
-  const workspaceConfigFile = fileOperators.readFile(configPath);
+  getConfig('../example-configs/config.json');
+  const workspaces = getKnownWorkspaces();
+  const workspaceConfigPath = workspaces['example-workspace-config'];
+  const workspaceConfigFile = fileOperators.readFile(workspaceConfigPath);
   const workspaceConfigParsed = WorkspaceConfigSchema.safeParse(JSON.parse(workspaceConfigFile));
   if (workspaceConfigParsed.success === false) {
     console.error(workspaceConfigParsed.error);
@@ -34,7 +34,7 @@ const run = async () => {
   }
 
   let workspaceConfig: ConfigImport | WorkspaceConfig = workspaceConfigParsed.data;
-  workspaceConfig = resolveImports(configPath, workspaceConfig);
+  workspaceConfig = resolveImports(workspaceConfigPath, workspaceConfig);
   const selectedEndpoint = workspaceConfig.endpoints?.queryParamTest;
   if (!selectedEndpoint) {
     throw new Error('Missing endpoint');

@@ -1,4 +1,4 @@
-import path from 'path';
+import path, {isAbsolute} from 'path';
 import merge from 'deepmerge';
 import {ConfigImport, ConfigImportSchema, WorkspaceConfig, ResolvedConfig} from './types';
 import {getFileOps} from './files';
@@ -8,9 +8,10 @@ export const resolveImports = (configPath: string, config: WorkspaceConfig | Con
   const fileOperators = getFileOps();
   const configDirectory = configPath.substring(0, configPath.lastIndexOf(path.sep));
   if (!config.imports) return config;
-  for (const toImport of config.imports) {
-    // FIXME: This will break, it assumes relative path only..
-    const importPath = path.join(configDirectory, toImport);
+  for (let importPath of config.imports) {
+    if (!isAbsolute(importPath)) {
+      importPath = path.join(configDirectory, importPath);
+    }
     const imported = fileOperators.readFile(importPath);
     const parsedImport = ConfigImportSchema.safeParse(JSON.parse(imported));
     if (parsedImport.success === false) {
