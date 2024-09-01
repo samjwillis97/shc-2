@@ -1,6 +1,5 @@
-import { getConfig, getKnownWorkspaces, ShcApiConfig } from "shc-api";
-import { getCwd, initNodeJsFileOpts } from "../utils";
-import { resolve } from "path";
+import { getConfig, getKnownWorkspaces } from "shc-api";
+import { defaultConfigFile, initNodeJsFileOpts } from "../utils";
 
 export const workspaceCompletionHandler = ({
   reply,
@@ -8,19 +7,6 @@ export const workspaceCompletionHandler = ({
   reply: (arg: string[]) => void;
 }) => {
   initNodeJsFileOpts();
-
-  // TODO: Real config
-  getConfig(
-    JSON.stringify({
-      workspaces: [
-        resolve(getCwd(), "../../api/example-configs/workspace.json"),
-      ],
-      yarnPath: resolve(
-        getCwd(),
-        "../node_modules/shc-api/bin/yarn-standalone.js",
-      ),
-    } as ShcApiConfig),
-  );
-
+  getConfig(defaultConfigFile());
   reply(Object.keys(getKnownWorkspaces()));
 };

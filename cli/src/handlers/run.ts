@@ -12,12 +12,14 @@ import {
   getConfig,
   getKnownWorkspaces,
 } from "shc-api";
-import { defaultConfigFile, initNodeJsFileOpts } from "../utils";
+import { initNodeJsFileOpts } from "../utils";
+import { program } from "commander";
 
 export const runHandler = async (workspace: string, endpoint: string) => {
   const fileOperations = initNodeJsFileOpts();
+  const options = program.optsWithGlobals();
 
-  getConfig(defaultConfigFile());
+  getConfig(options.config);
 
   const workspaces = getKnownWorkspaces();
   if (!workspaces[workspace])
