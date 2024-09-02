@@ -4,6 +4,9 @@
   "description": "",
   "main": "./lib/index.js",
   "module": "./lib/index.mjs",
+  "repository": {
+    "url": "https://github.com/samjwillis97/shc-api"
+  },
   "files": [
     "/lib",
     "/index.d.ts"
