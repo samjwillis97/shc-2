@@ -7,7 +7,7 @@ import {
   rmSync,
   statSync,
 } from "fs";
-import { dirname, isAbsolute, join, resolve } from "path";
+import { dirname, isAbsolute, resolve } from "path";
 import { FileOps, setFileOps } from "shc-api";
 
 export const defaultConfigFile = () =>

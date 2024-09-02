@@ -16,18 +16,23 @@
 
         pkgs = import nixpkgs { inherit system overlays; };
 
-        # for dev shells nativeBuildInputs and buildInputs make no difference
-        # though buildInputs are needed at run-time while nativeBuildInputs
-        # are things only needed at compile time
+        shc-cli = pkgs.buildNpmPackage {
+          pname = "shc-cli";
+          src = ./cli;
+          name = "shc";
+          npmDepsHash = "sha256-RpXWsj3HE22p2YREl66mKpS7cIef/vBXiU1BFJDIkP8=";
+          makeCacheWritable = false;
+        };
 
         nativeBuildInputs = with pkgs; [ ];
 
-        buildInputs = with pkgs; [
-          nodejs_20
-          fish
-        ];
+        buildInputs = with pkgs; [ nodejs_20 ];
 
-        packages = [ ];
+        packages = with pkgs; [
+          fish
+          prefetch-npm-deps
+          shc-cli
+        ];
       in
       with pkgs;
       {
@@ -38,6 +43,10 @@
             export PATH=$PATH:$PWD/api/node_modules/.bin
             export PATH=$PATH:$PWD/cli/node_modules/.bin
           '';
+        };
+
+        packages = {
+          default = shc-cli;
         };
       }
     );

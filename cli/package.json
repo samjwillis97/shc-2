@@ -1,5 +1,5 @@
 {
-  "name": "cli",
+  "name": "shc-cli",
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
@@ -7,6 +7,7 @@
     "dev": "export env=DEV; npx ts-node src/index.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "bin": "dist/index.js",
   "keywords": [],
   "author": "",
   "license": "ISC",
@@ -15,7 +16,7 @@
     "@inquirer/prompts": "^5.3.8",
     "commander": "^12.1.0",
     "omelette": "^0.4.17",
-    "shc-api": "file:../api"
+    "shc-api": "^1.0.3"
   },
   "devDependencies": {
     "@types/node": "^22.5.1",
