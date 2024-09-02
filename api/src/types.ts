@@ -110,7 +110,7 @@ export const ModuleJsonSchema = z.object({
 
 export interface Module {
   'pre-request-hooks': {
-    [key: string]: (ctx: RunnerContext, config: unknown) => Promise<void> | void;
+    [key: string]: (ctx: RunnerContext, config: unknown, callbacks: Callbacks) => Promise<void> | void;
   };
   'post-request-hooks': {
     [key: string]: (ctx: RunnerContext, config: unknown) => Promise<void> | void;
@@ -141,4 +141,8 @@ export type RunnerContext = {
   req: RequestInit;
   hooks: RunnerParams['hooks'];
   res?: Response;
+};
+
+export type Callbacks = {
+  stringInput?: (message: string) => Promise<string>;
 };

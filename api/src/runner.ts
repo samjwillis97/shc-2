@@ -1,5 +1,5 @@
 import {mergedConfigToRunnerParams} from './config';
-import {getPlugin} from './plugins';
+import {getCallbacks, getPlugin} from './plugins';
 import {resolveTemplates} from './templates';
 import {ConfigImport, EndpointConfig, RunnerContext, WorkspaceConfig} from './types';
 
@@ -8,8 +8,9 @@ const executeHooks = async (ctx: RunnerContext, hooks: string[] = []) => {
     const [pluginName, methodName] = hook.split('.');
     const plugin = getPlugin(pluginName);
     const method = plugin.module['pre-request-hooks'][methodName];
+    const callbacks = getCallbacks();
     if (!method) throw new Error(`Failed to find pre request hook or something: ${methodName}`);
-    await method(ctx, plugin.config);
+    await method(ctx, plugin.config, callbacks ?? {});
   }
 };
 

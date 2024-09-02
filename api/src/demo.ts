@@ -1,5 +1,5 @@
 import {cpSync, existsSync, mkdirSync, readdirSync, readFileSync, rmSync, statSync} from 'fs';
-import {cleanPluginDir, installPlugin, loadPlugins, loadVariableGroups} from './plugins';
+import {cleanPluginDir, installPlugin, loadPlugins, loadVariableGroups, setCallbacks} from './plugins';
 import {ConfigImport, WorkspaceConfig, WorkspaceConfigSchema} from './types';
 import {getConfig, getKnownWorkspaces, mergeWorkspaceAndEndpointConfig} from './config';
 import {extractVariables} from './variables';
@@ -22,6 +22,9 @@ const initNodeJsFileOpts = () => {
 const run = async () => {
   initNodeJsFileOpts();
   const fileOperators = getFileOps();
+  setCallbacks({
+    stringInput: async () => 'not implemented properly',
+  });
 
   getConfig('../example-configs/config.json');
   const workspaces = getKnownWorkspaces();

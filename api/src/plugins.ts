@@ -2,7 +2,7 @@ import {tmpdir} from 'os';
 import path from 'path';
 import childProcess from 'child_process';
 import {getConfig, getYarnPath} from './config';
-import {ModuleJsonSchema, Plugin, ResolvedConfig, ShcPlugin, WorkspaceConfig} from './types';
+import {Callbacks, ModuleJsonSchema, Plugin, ResolvedConfig, ShcPlugin, WorkspaceConfig} from './types';
 import base from './extensions/base';
 import {createModulesFromVariableGroups} from './variableGroups';
 import {z} from 'zod';
@@ -10,6 +10,15 @@ import {resolveTemplates} from './templates';
 import {getFileOps} from './files';
 
 const pluginMap: Record<string, Plugin> | undefined = {};
+let callbacks: Callbacks | undefined = undefined;
+
+export const setCallbacks = (toSet: Callbacks) => {
+  callbacks = toSet;
+};
+
+export const getCallbacks = (): Callbacks | undefined => {
+  return callbacks;
+};
 
 const validateModuleJson = (moduleJson: string) => {
   try {

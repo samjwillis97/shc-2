@@ -11,12 +11,19 @@ import {
   WorkspaceConfigSchema,
   getConfig,
   getKnownWorkspaces,
+  setCallbacks,
 } from "shc-api";
 import { initNodeJsFileOpts } from "../utils";
 import { program } from "commander";
+import { input } from "@inquirer/prompts";
 
 export const runHandler = async (workspace: string, endpoint: string) => {
   const fileOperations = initNodeJsFileOpts();
+
+  setCallbacks({
+    stringInput: async (msg: string) => await input({ message: msg }),
+  });
+
   const options = program.optsWithGlobals();
 
   getConfig(options.config);
