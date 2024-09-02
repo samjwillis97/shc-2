@@ -6,13 +6,13 @@ import { listHandler } from "./handlers/list";
 import { defaultConfigFile } from "./utils";
 const omelette = require("omelette");
 
-const completion = omelette("shc run <workspace> <endpoint>");
+const completion = omelette("shc-cli run <workspace> <endpoint>");
 completion.on("workspace", workspaceCompletionHandler);
 completion.on("endpoint", endpointCompletionHandler);
 completion.init();
 
 // TODO: OVerride flag for variables/templates/etc
-program.name("shc").description("Sams HTTP client");
+program.name("shc-cli").description("Sams HTTP client");
 program.option(
   "-c, --config <file>",
   "specify config json",
