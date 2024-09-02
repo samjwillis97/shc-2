@@ -18,6 +18,11 @@ program.option(
   "specify config json",
   defaultConfigFile(),
 );
+program.option(
+  "-s, --set <key=value...>",
+  "override a variable",
+  defaultConfigFile(),
+);
 program.command("run <workspace> <endpoint>").action(runHandler);
 program.command("list <object>").action(listHandler);
 program.parse();

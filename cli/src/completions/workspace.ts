@@ -4,6 +4,7 @@ import {
   initNodeJsFileOpts,
   tryGetConfigFromCmd,
 } from "../utils";
+import { program } from "commander";
 
 export const workspaceCompletionHandler = ({
   line,

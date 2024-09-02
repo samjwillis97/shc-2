@@ -12,6 +12,7 @@ import {
   getConfig,
   getKnownWorkspaces,
   setCallbacks,
+  setVariable,
 } from "shc-api";
 import { initNodeJsFileOpts } from "../utils";
 import { program } from "commander";
@@ -24,7 +25,10 @@ export const runHandler = async (workspace: string, endpoint: string) => {
     stringInput: async (msg: string) => await input({ message: msg }),
   });
 
-  const options = program.optsWithGlobals();
+  const options = program.optsWithGlobals<{
+    config: string;
+    set?: string[];
+  }>();
 
   getConfig(options.config);
 
@@ -62,6 +66,13 @@ export const runHandler = async (workspace: string, endpoint: string) => {
   }
 
   loadVariableGroups(mergedConfig.variableGroups);
+
+  if (options.set) {
+    for (const s of options.set) {
+      const [key, val] = s.split("=");
+      setVariable(key, val);
+    }
+  }
 
   const runnerContext = createRunnerContext(mergedConfig);
   const response = await run(runnerContext);
