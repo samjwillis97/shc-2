@@ -143,6 +143,7 @@ export type RunnerContext = {
   res?: Response;
 };
 
+// TODO: Think about a list callback, so could select like a variable group as needed?
 export type Callbacks = {
   stringInput?: (message: string) => Promise<string>;
 };
