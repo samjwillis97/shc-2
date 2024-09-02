@@ -2,6 +2,10 @@ import {resolveTemplateInString} from './templates';
 
 let variables: Record<string, string> = {};
 
+export const setVariable = (key: string, value: string) => {
+  variables[key] = value;
+};
+
 export const extractVariables = (configVariables?: Record<string, string>) => {
   if (configVariables) {
     variables = configVariables;
