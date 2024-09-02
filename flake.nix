@@ -20,7 +20,7 @@
           pname = "shc-cli";
           src = ./cli;
           name = "shc";
-          npmDepsHash = "sha256-RpXWsj3HE22p2YREl66mKpS7cIef/vBXiU1BFJDIkP8=";
+          npmDepsHash = "sha256-wDZS3VRsBB6yCPFguxkJLPmPWCuNn8kl1KqXhjNHvVw=";
           makeCacheWritable = false;
         };
 
