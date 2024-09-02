@@ -7,11 +7,13 @@ import {
   rmSync,
   statSync,
 } from "fs";
-import { dirname, isAbsolute, resolve } from "path";
+import { dirname, isAbsolute, join, resolve } from "path";
 import { FileOps, setFileOps } from "shc-api";
 
 export const defaultConfigFile = () =>
-  isDev() ? "../example-configs/config.json" : "$HOME/.config/shc/config.json";
+  isDev()
+    ? "../example-configs/config.json"
+    : join(process.env.HOME ?? "~", "/.config/shc/config.json");
 
 export const isDev = () => process.env["env"] === "DEV";
 
