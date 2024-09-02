@@ -1,6 +1,6 @@
 {
   "name": "shc-api",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "",
   "main": "./lib/index.js",
   "module": "./lib/index.mjs",
@@ -8,8 +8,8 @@
     "url": "https://github.com/samjwillis97/shc-api"
   },
   "files": [
-    "/lib",
-    "/index.d.ts"
+    "lib",
+    "index.d.ts"
   ],
   "exports": {
     ".": {
