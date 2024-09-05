@@ -3,8 +3,10 @@ import {resolveTemplates} from './templates';
 import {ConfigImport, EndpointConfig, RunnerContext, WorkspaceConfig} from './types';
 import {executePostContextHooks, executePreContextHooks} from './hooks';
 
-export const createRunnerContext = (config: (WorkspaceConfig | ConfigImport) & EndpointConfig): RunnerContext => {
-  executePreContextHooks(config.hooks['pre-context']);
+export const createRunnerContext = async (
+  config: (WorkspaceConfig | ConfigImport) & EndpointConfig,
+): Promise<RunnerContext> => {
+  await executePreContextHooks(config.hooks['pre-context']);
   const resolvedConfig = resolveTemplates(config);
   const params = mergedConfigToRunnerParams(resolvedConfig);
   const request: RequestInit = {

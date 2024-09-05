@@ -24,7 +24,22 @@ export const resolveTemplates = <T extends object | string>(thing: T): T => {
   return thing;
 };
 
-export const resolveTemplateInString = (str: string): string => {
+export const resolveTemplateInString = (str: string): unknown => {
+  const matches = str.match(/{{(.*?)}}/g);
+  if (!matches) return str;
+
+  if (matches.length === 1 && str.startsWith('{{') && str.endsWith('}}')) {
+    const match = matches[0].slice(2, -2);
+    if (match.includes('.')) {
+      const [pluginName, methodName] = match.split('.');
+      const plugin = getPlugin(pluginName);
+      const method = plugin.module['template-handlers'][methodName];
+      if (!method) throw new Error(`Failed to find method or something: ${methodName}`);
+      return method(plugin.config);
+    }
+    return getVariable(match);
+  }
+
   return str.replace(/{{(.*?)}}/g, (_, key: string) => {
     if (key.includes('.')) {
       const [pluginName, methodName] = key.split('.');
@@ -33,9 +48,15 @@ export const resolveTemplateInString = (str: string): string => {
       const method = plugin.module['template-handlers'][methodName];
       if (!method) throw new Error(`Failed to find method or something: ${methodName}`);
 
-      return method(plugin.config);
+      const returned = method(plugin.config);
+      if (typeof returned !== 'string') throw new Error(`Method ${methodName} must return a string`);
+
+      return returned;
     }
 
-    return getVariable(key) ?? '';
+    const variable = getVariable(key);
+    if (typeof variable !== 'string') throw new Error(`Variable ${key} must be a string`);
+
+    return variable;
   });
 };

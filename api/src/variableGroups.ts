@@ -4,7 +4,7 @@ import {Plugin, VariableGroup} from './types';
 
 export const createModuleFromVariableGroup = (group: VariableGroup) => {
   const resolvedGroupValue = group.values[group.default];
-  const handlers: Record<string, () => string> = {};
+  const handlers: Record<string, () => unknown> = {};
 
   for (const key of Object.keys(resolvedGroupValue)) {
     const value = resolvedGroupValue[key];

@@ -28,7 +28,8 @@ const HeaderSchema = z.record(z.string(), z.string()).default({});
 // Add custom validation to make sure default is one of the keys of values
 const VariableGroupSchema = z.object({
   default: z.string(),
-  values: z.record(z.string(), z.record(z.string(), z.string())),
+  // values: z.record(z.string(), z.record(z.string(), z.string())),
+  values: z.record(z.string(), z.record(z.string(), z.unknown())),
 });
 
 const VariableGroupsSchema = z.record(z.string(), VariableGroupSchema).default({});
@@ -121,7 +122,7 @@ export interface Module {
     [key: string]: (ctx: RunnerContext, config: unknown) => Promise<void> | void;
   };
   'template-handlers': {
-    [key: string]: (config: unknown) => string;
+    [key: string]: (config: unknown) => unknown;
   };
 }
 

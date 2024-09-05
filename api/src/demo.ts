@@ -56,7 +56,7 @@ const run = async () => {
 
   loadVariableGroups(workspaceConfig.variableGroups);
 
-  const runnerContext = createRunnerContext(mergedConfig);
+  const runnerContext = await createRunnerContext(mergedConfig);
   const response = await execute(runnerContext);
   console.log(JSON.stringify(response, null, 2));
 };
