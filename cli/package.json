@@ -16,7 +16,7 @@
     "@inquirer/prompts": "^5.3.8",
     "commander": "^12.1.0",
     "omelette": "^0.4.17",
-    "shc-api": "^1.0.4"
+    "shc-api": "^1.1.1"
   },
   "devDependencies": {
     "@types/node": "^22.5.1",
