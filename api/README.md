@@ -17,3 +17,4 @@
         - actually maybe the auto discovery stuff is better for consumer, but other stuff is good for a collection
 - Okay, so... I need to work out who is going to do file system operations.. Maybe I provide a callback to do the file op?
     - OR a setup function to provide the file system operations that can be used throughout...
+- How would you handle policy creator

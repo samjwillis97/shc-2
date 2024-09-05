@@ -320,6 +320,11 @@ export const loadVariableGroups = (groups: ResolvedConfig['variableGroups']) => 
   }
 };
 
+export const setPlugin = (name: string, plugin: Plugin) => {
+  if (pluginMap[name]) throw new Error(`Unable to set plugin: ${name}, already exists`);
+  pluginMap[name] = plugin;
+};
+
 export const getPlugin = (name: string) => {
   if (!pluginMap[name]) throw new Error(`Unable to get plugin: ${name}`);
   const toReturn = pluginMap[name];

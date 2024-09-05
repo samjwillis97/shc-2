@@ -1,6 +1,7 @@
 import {Module, RunnerContext} from '../types';
 
 export const base: Module = {
+  'pre-context-hooks': {},
   'pre-request-hooks': {
     logConfig: (_: RunnerContext, config: unknown) => {
       console.log('Pre-request Config:');

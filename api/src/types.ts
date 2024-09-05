@@ -10,14 +10,16 @@ const getAppDir = () => {
 };
 const HooksSchema = z
   .object({
+    'pre-context': z.array(z.string()).default([]),
     'pre-request': z.array(z.string()).default([]),
     'post-request': z.array(z.string()).default([]),
   })
   .default({
+    'pre-context': [],
     'pre-request': [],
     'post-request': [],
   });
-type Hooks = z.infer<typeof HooksSchema>;
+export type Hooks = z.infer<typeof HooksSchema>;
 
 const VariablesSchema = z.record(z.string(), z.string()).default({});
 const QueryParameterSchema = z.record(z.string(), z.string()).default({});
@@ -109,6 +111,9 @@ export const ModuleJsonSchema = z.object({
 });
 
 export interface Module {
+  'pre-context-hooks': {
+    [key: string]: (config: unknown, callbacks: Callbacks, methods: PreContextMethods) => Promise<void> | void;
+  };
   'pre-request-hooks': {
     [key: string]: (ctx: RunnerContext, config: unknown, callbacks: Callbacks) => Promise<void> | void;
   };
@@ -146,4 +151,8 @@ export type RunnerContext = {
 // TODO: Think about a list callback, so could select like a variable group as needed?
 export type Callbacks = {
   stringInput?: (message: string) => Promise<string>;
+};
+
+export type PreContextMethods = {
+  setVariableGroup: (group: string, value: {[key: string]: string}) => Promise<void> | void;
 };

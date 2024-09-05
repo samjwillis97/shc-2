@@ -31,6 +31,7 @@
         packages = with pkgs; [
           fish
           prefetch-npm-deps
+          jless
           shc-cli
         ];
       in

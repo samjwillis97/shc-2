@@ -2,7 +2,7 @@
 
 import {Plugin, VariableGroup} from './types';
 
-const createModuleFromVariableGroup = (group: VariableGroup) => {
+export const createModuleFromVariableGroup = (group: VariableGroup) => {
   const resolvedGroupValue = group.values[group.default];
   const handlers: Record<string, () => string> = {};
 
@@ -12,6 +12,7 @@ const createModuleFromVariableGroup = (group: VariableGroup) => {
   }
 
   return {
+    'pre-context-hooks': {},
     'pre-request-hooks': {},
     'post-request-hooks': {},
     'template-handlers': handlers,

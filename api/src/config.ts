@@ -64,6 +64,7 @@ export const mergeWorkspaceAndEndpointConfig = (
   const merged = merge(workspace, endpoint);
   merged.headers = {...workspace.headers, ...endpoint.headers};
   merged.hooks = {
+    'pre-context': [...workspace.hooks['pre-context'], ...endpoint.hooks['pre-context']],
     'pre-request': [...workspace.hooks['pre-request'], ...endpoint.hooks['pre-request']],
     'post-request': [...workspace.hooks['post-request'], ...endpoint.hooks['post-request']],
   };
@@ -77,6 +78,7 @@ export const mergedConfigToRunnerParams = (config: (WorkspaceConfig | ConfigImpo
     endpoint: config.endpoint,
     headers: config.headers,
     hooks: {
+      'pre-context': config.hooks['pre-context'],
       'pre-request': config.hooks['pre-request'],
       'post-request': config.hooks['post-request'],
     },

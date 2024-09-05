@@ -1,20 +1,10 @@
 import {mergedConfigToRunnerParams} from './config';
-import {getCallbacks, getPlugin} from './plugins';
 import {resolveTemplates} from './templates';
 import {ConfigImport, EndpointConfig, RunnerContext, WorkspaceConfig} from './types';
-
-const executeHooks = async (ctx: RunnerContext, hooks: string[] = []) => {
-  for (const hook of hooks) {
-    const [pluginName, methodName] = hook.split('.');
-    const plugin = getPlugin(pluginName);
-    const method = plugin.module['pre-request-hooks'][methodName];
-    const callbacks = getCallbacks();
-    if (!method) throw new Error(`Failed to find pre request hook or something: ${methodName}`);
-    await method(ctx, plugin.config, callbacks ?? {});
-  }
-};
+import {executePostContextHooks, executePreContextHooks} from './hooks';
 
 export const createRunnerContext = (config: (WorkspaceConfig | ConfigImport) & EndpointConfig): RunnerContext => {
+  executePreContextHooks(config.hooks['pre-context']);
   const resolvedConfig = resolveTemplates(config);
   const params = mergedConfigToRunnerParams(resolvedConfig);
   const request: RequestInit = {
@@ -52,7 +42,7 @@ export const createRunnerContext = (config: (WorkspaceConfig | ConfigImport) & E
 
 export const run = async (ctx: RunnerContext) => {
   if (ctx.hooks) {
-    await executeHooks(ctx, ctx.hooks['pre-request']);
+    await executePostContextHooks(ctx, 'pre-request-hooks');
   }
 
   let response: Response | undefined;
@@ -60,7 +50,7 @@ export const run = async (ctx: RunnerContext) => {
     response = await fetch(new Request(ctx.url, ctx.req));
     ctx.res = response;
     if (ctx.hooks) {
-      await executeHooks(ctx, ctx.hooks['post-request']);
+      await executePostContextHooks(ctx, 'post-request-hooks');
     }
     return response.json();
   } catch (err) {
