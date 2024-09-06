@@ -4,7 +4,6 @@ import {createModuleFromVariableGroup} from './variableGroups';
 
 const preContextMethods: PreContextMethods = {
   setVariableGroup: (group, value) => {
-    console.log(value);
     const module = createModuleFromVariableGroup({
       default: 'default',
       values: {

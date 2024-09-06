@@ -321,17 +321,22 @@ export const loadVariableGroups = (groups: ResolvedConfig['variableGroups']) => 
 };
 
 export const setPlugin = (name: string, plugin: Plugin) => {
-  if (pluginMap[name]) throw new Error(`Unable to set plugin: ${name}, already exists`);
+  if (pluginMap[name]) console.warn(`plugin: ${name}, already exists - overwriting`);
   pluginMap[name] = plugin;
 };
 
 export const getPlugin = (name: string) => {
   if (!pluginMap[name]) throw new Error(`Unable to get plugin: ${name}`);
   const toReturn = pluginMap[name];
+  let config: Record<string, unknown> = {};
   if (toReturn.config) {
-    toReturn.config = resolveTemplates(toReturn.config);
+    config = JSON.parse(JSON.stringify(toReturn.config));
+    config = resolveTemplates(config);
   }
-  return toReturn;
+  return {
+    ...toReturn,
+    config,
+  };
 };
 
 export const cleanPluginDir = async () => {
