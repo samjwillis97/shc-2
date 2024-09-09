@@ -84,8 +84,10 @@ export const ShcApiConfigSchema = z.object({
   workspaces: z.array(z.string()).default([]),
   variables: VariablesSchema,
   variableGroups: VariableGroupsSchema,
+  // FIXME: Relevant still?
   // THIS NEEDS TO BE ABSOLUTE, or handle as relative :thonk:
   yarnPath: z.string().default(path.resolve(getAppDir(), '../bin/yarn-standalone.js')),
+  logLevel: z.enum(['info', 'debug']).default('info'),
   pluginDirectory: z
     .string()
     .default(
@@ -116,10 +118,15 @@ export interface Module {
     [key: string]: (config: unknown, callbacks: Callbacks, methods: PreContextMethods) => Promise<void> | void;
   };
   'pre-request-hooks': {
-    [key: string]: (ctx: RunnerContext, config: unknown, callbacks: Callbacks) => Promise<void> | void;
+    [key: string]: (
+      ctx: RunnerContext,
+      config: unknown,
+      methods: PluginBaseMethods,
+      callbacks: Callbacks,
+    ) => Promise<void> | void;
   };
   'post-request-hooks': {
-    [key: string]: (ctx: RunnerContext, config: unknown) => Promise<void> | void;
+    [key: string]: (ctx: RunnerContext, config: unknown, methods: PluginBaseMethods) => Promise<void> | void;
   };
   'template-handlers': {
     [key: string]: (config: unknown) => unknown;
@@ -154,6 +161,10 @@ export type Callbacks = {
   stringInput?: (message: string) => Promise<string>;
 };
 
+export type PluginBaseMethods = {
+  log: (message: string) => void;
+};
+
 export type PreContextMethods = {
   setVariableGroup: (group: string, value: {[key: string]: string}) => Promise<void> | void;
-};
+} & PluginBaseMethods;

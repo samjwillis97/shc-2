@@ -324,7 +324,8 @@ export const loadVariableGroups = (groups: ResolvedConfig['variableGroups']) => 
 };
 
 export const setPlugin = (name: string, plugin: Plugin) => {
-  if (pluginMap[name]) console.warn(`plugin: ${name}, already exists - overwriting`);
+  if (pluginMap[name] && getConfig().logLevel === 'debug')
+    console.log(`[plugins] plugin: ${name}, already exists - overwriting`);
   pluginMap[name] = plugin;
 };
 
