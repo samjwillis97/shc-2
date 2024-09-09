@@ -276,18 +276,21 @@ export const installPlugin = async (plugin: string) => {
     console.log(err);
     throw new Error(`Failed to move plugin, name in the package.json may be incorrect`);
   }
+  // FIXME - IDK if this is necessary, because it should be happening anyway?
   // Move each dependency into node_modules folder
-  const pluginModulesDir = path.join(pluginDir, 'node_modules');
-  fileOperators.mkDirRecursive(pluginModulesDir);
-  for (const filename of fileOperators.readDir(tmpDir)) {
-    const src = path.join(tmpDir, filename);
-    if (filename === plugin || !fileOperators.isDir(src)) {
-      continue;
-    }
+  // const pluginModulesDir = path.join(pluginDir, 'node_modules');
+  // fileOperators.mkDirRecursive(pluginModulesDir);
+  // console.log(fileOperators.readDir(tmpDir));
+  // for (const filename of fileOperators.readDir(tmpDir)) {
+  //   const src = path.join(tmpDir, filename);
+  //   if (filename === plugin || !fileOperators.isDir(src)) {
+  //     continue;
+  //   }
 
-    const dest = path.join(pluginModulesDir, filename);
-    fileOperators.cp(src, dest);
-  }
+  //   const dest = path.join(pluginModulesDir, filename);
+  //   console.log(`cp ${src} ${dest}`);
+  //   fileOperators.cp(src, dest);
+  // }
 };
 
 const importExtensions = (pluginConfigs: WorkspaceConfig['pluginConfig']) => {
